@@ -76,15 +76,36 @@ export interface Purchase {
     id: number;
     name: string;
     type: string;
+    image?: string;
+  };
+  download?: {
+    type: string;
+    url: string;
+    filename: string;
   };
   price_paid: number;
+  payment_method: string;
   payment_status: string;
   status: string;
   download_count: number;
   max_downloads: number;
   can_download: boolean;
+  access_expires_at?: string;
+  last_download_at?: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface PurchaseUser {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export interface PurchasesResponse {
+  purchases: Purchase[];
+  count: number;
+  user?: PurchaseUser;
 }
 
 export interface ApiResponse<T> {
@@ -175,11 +196,13 @@ export async function checkPayment(transactionId: string): Promise<PaymentStatus
 }
 
 // Buscar compras do usuário
-export async function getUserPurchases(email: string): Promise<{ purchases: Purchase[]; count: number }> {
+export async function getUserPurchases(email: string): Promise<PurchasesResponse> {
   const res = await fetch(`${API_URL}/api/user-purchases.php?email=${encodeURIComponent(email)}`);
-  const data: ApiResponse<{ purchases: Purchase[]; count: number }> = await res.json();
+  const data = await res.json();
   
-  if (!data.success) throw new Error(data.message);
+  if (!data.success) {
+    throw new Error(data.error || data.message || 'Erro ao buscar compras');
+  }
   return data.data;
 }
 

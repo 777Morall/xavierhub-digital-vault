@@ -19,13 +19,14 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { getUserPurchases, getDownloadUrl, formatPrice, Purchase } from "@/lib/api";
+import { getUserPurchases, formatPrice, Purchase, PurchaseUser } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
 const MyPurchases = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [user, setUser] = useState<PurchaseUser | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
@@ -41,6 +42,7 @@ const MyPurchases = () => {
     try {
       const data = await getUserPurchases(email);
       setPurchases(data.purchases || []);
+      setUser(data.user || null);
       if (!data.purchases || data.purchases.length === 0) {
         toast({
           title: "Nenhuma compra encontrada",
@@ -59,8 +61,8 @@ const MyPurchases = () => {
     }
   };
 
-  const handleDownload = (purchaseCode: string) => {
-    window.open(getDownloadUrl(purchaseCode), '_blank');
+  const handleDownload = (downloadUrl: string) => {
+    window.open(downloadUrl, '_blank');
     toast({
       title: "Download Iniciado!",
       description: "Seu arquivo será baixado em instantes.",
@@ -187,9 +189,17 @@ const MyPurchases = () => {
                         {/* Header */}
                         <div className="flex items-start justify-between gap-4 mb-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
-                              <Package className="h-6 w-6 text-primary" />
-                            </div>
+                            {purchase.product.image ? (
+                              <img 
+                                src={purchase.product.image} 
+                                alt={purchase.product.name}
+                                className="w-12 h-12 rounded-xl object-cover shrink-0"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
+                                <Package className="h-6 w-6 text-primary" />
+                              </div>
+                            )}
                             <div className="min-w-0">
                               <h3 className="font-semibold text-foreground truncate">
                                 {purchase.product.name}
@@ -224,13 +234,13 @@ const MyPurchases = () => {
                         </div>
 
                         {/* Download Info */}
-                        {purchase.can_download && purchase.payment_status === 'paid' && (
+                        {purchase.can_download && purchase.payment_status === 'paid' && purchase.download && (
                           <div className="flex items-center justify-between">
                             <p className="text-xs text-muted-foreground">
                               Downloads: {purchase.download_count}/{purchase.max_downloads}
                             </p>
                             <Button 
-                              onClick={() => handleDownload(purchase.purchase_code)}
+                              onClick={() => handleDownload(purchase.download!.url)}
                               size="sm"
                               className="glow-effect"
                             >
