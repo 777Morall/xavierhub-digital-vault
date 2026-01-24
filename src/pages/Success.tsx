@@ -191,54 +191,38 @@ const SuccessPage = () => {
               </p>
             </div>
 
-            {/* Download Card */}
-            <div className="card-glass rounded-2xl p-6">
-              <h3 className="font-display font-bold text-lg mb-4 flex items-center gap-2">
-                <Download className="h-5 w-5 text-primary" />
-                Baixar Produto
-              </h3>
-
-              <Button 
-                onClick={handleDownload}
-                size="lg"
-                className="w-full h-14 text-base font-semibold glow-effect"
-              >
-                <Download className="h-5 w-5 mr-2" />
-                Fazer Download Agora
-              </Button>
-
-              <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  <span>Acesso imediato</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Shield className="h-4 w-4" />
-                  <span>Download seguro</span>
-                </div>
+            {/* Email Notification Card */}
+            <div className="card-glass rounded-2xl p-6 text-center">
+              <div className="w-14 h-14 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                <Mail className="h-7 w-7 text-primary" />
               </div>
+              <h3 className="font-display font-bold text-lg mb-2">
+                Confirmação por E-mail
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                Você receberá um e-mail com os detalhes da sua compra e instruções de acesso ao produto.
+              </p>
             </div>
 
-            {/* Actions */}
-            <div className="grid grid-cols-2 gap-4">
-              <Button 
-                variant="outline"
-                onClick={() => navigate("/meus-produtos")}
-                className="h-12"
-              >
-                <Package className="h-4 w-4 mr-2" />
-                Meus Produtos
-              </Button>
-              
-              <Button 
-                variant="outline"
-                onClick={() => navigate("/")}
-                className="h-12"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Ver Catálogo
-              </Button>
-            </div>
+            {/* Action Button */}
+            <Button 
+              onClick={() => navigate("/meus-produtos")}
+              size="lg"
+              className="w-full h-14 text-base font-semibold glow-effect"
+            >
+              <Package className="h-5 w-5 mr-2" />
+              Acessar Meus Produtos
+            </Button>
+
+            {/* Secondary Action */}
+            <Button 
+              variant="outline"
+              onClick={() => navigate("/")}
+              className="w-full h-12"
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Continuar Comprando
+            </Button>
 
             {/* Help */}
             <div className="text-center">
