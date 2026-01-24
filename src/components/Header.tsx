@@ -1,13 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingCart, User, Package } from "lucide-react";
+import { Menu, X, User, Package, LogIn, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { isAuthenticated, getStoredUser, logout } from "@/lib/auth";
+import type { User as UserType } from "@/lib/auth";
 import logo from "@/assets/logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<UserType | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      setUser(getStoredUser());
+    }
+  }, [location]);
 
   const navLinks = [
     { name: "Início", href: "/" },
@@ -15,6 +31,11 @@ const Header = () => {
     { name: "Categorias", href: "/#categorias" },
     { name: "Contato", href: "/#contato" },
   ];
+
+  const handleLogout = () => {
+    logout();
+    setUser(null);
+  };
 
   const handleNavClick = (href: string) => {
     setIsMenuOpen(false);
@@ -61,22 +82,60 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="hidden md:flex"
-              onClick={() => navigate("/meus-produtos")}
-            >
-              <Package className="h-5 w-5" />
-            </Button>
-            <Button 
-              variant="glow" 
-              className="hidden md:flex"
-              onClick={() => navigate("/meus-produtos")}
-            >
-              <User className="h-4 w-4 mr-2" />
-              Meus Produtos
-            </Button>
+            {user ? (
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="hidden md:flex"
+                  onClick={() => navigate("/meus-produtos")}
+                >
+                  <Package className="h-5 w-5" />
+                </Button>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="glow" className="hidden md:flex">
+                      <User className="h-4 w-4 mr-2" />
+                      {user.username}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={() => navigate("/meus-produtos")}>
+                      <Package className="h-4 w-4 mr-2" />
+                      Meus Produtos
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/perfil")}>
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configurações
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sair
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Button 
+                  variant="ghost" 
+                  className="hidden md:flex"
+                  onClick={() => navigate("/login")}
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Entrar
+                </Button>
+                <Button 
+                  variant="glow" 
+                  className="hidden md:flex"
+                  onClick={() => navigate("/registrar")}
+                >
+                  Criar Conta
+                </Button>
+              </>
+            )}
 
             {/* Mobile Menu Toggle */}
             <Button
@@ -102,17 +161,68 @@ const Header = () => {
                 {link.name}
               </button>
             ))}
-            <Button 
-              variant="glow" 
-              className="w-full mt-4"
-              onClick={() => {
-                setIsMenuOpen(false);
-                navigate("/meus-produtos");
-              }}
-            >
-              <User className="h-4 w-4 mr-2" />
-              Meus Produtos
-            </Button>
+            
+            {user ? (
+              <div className="mt-4 space-y-2">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/meus-produtos");
+                  }}
+                >
+                  <Package className="h-4 w-4 mr-2" />
+                  Meus Produtos
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/perfil");
+                  }}
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  Configurações
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full text-destructive"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    handleLogout();
+                  }}
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sair
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-4 space-y-2">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/login");
+                  }}
+                >
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Entrar
+                </Button>
+                <Button 
+                  variant="glow" 
+                  className="w-full"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate("/registrar");
+                  }}
+                >
+                  Criar Conta
+                </Button>
+              </div>
+            )}
           </nav>
         )}
       </div>
