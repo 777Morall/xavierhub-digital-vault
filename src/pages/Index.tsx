@@ -1,8 +1,7 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import FeaturedProducts from "@/components/FeaturedProducts";
-import TestimonialsMarquee from "@/components/TestimonialsMarquee";
 import CategoriesSection from "@/components/CategoriesSection";
+import FeaturedProducts from "@/components/FeaturedProducts";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -11,9 +10,8 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
-        <TestimonialsMarquee />
-        <FeaturedProducts />
         <CategoriesSection />
+        <FeaturedProducts />
       </main>
       <Footer />
     </div>
