@@ -48,42 +48,42 @@ const Checkout = () => {
     
     if (!product || !email) return;
     
+    // Gera UUID único para a transação ANTES de qualquer operação async
+    const transactionId = generateUUID();
+    
+    setSubmitting(true);
+    setError(null);
+    
+    console.log('=== CREATING PAYMENT ===');
+    console.log('Product ID:', product.id);
+    console.log('Email:', email);
+    console.log('Transaction ID:', transactionId);
+    
     try {
-      setSubmitting(true);
-      setError(null);
-      
-      // Gera UUID único para a transação
-      const transactionId = generateUUID();
-      
-      console.log('=== CREATING PAYMENT ===');
-      console.log('Product ID:', product.id);
-      console.log('Email:', email);
-      console.log('Transaction ID:', transactionId);
-      
       // Cria o pagamento no backend
       const paymentData = await createPayment(product.id, email, transactionId);
       
-      console.log('Payment created successfully:', paymentData.transaction_id);
+      console.log('Payment created successfully:', paymentData);
+      console.log('Redirecting to:', `/pagar/${paymentData.transaction_id}`);
       
       toast({
         title: "Pagamento criado!",
         description: "Redirecionando para o QR Code...",
       });
       
-      // Redireciona para a página de pagamento
-      navigate(`/pagar/${paymentData.transaction_id}`);
+      // Redireciona IMEDIATAMENTE para a página de pagamento
+      window.location.href = `/pagar/${paymentData.transaction_id}`;
       
     } catch (err) {
       console.error('=== PAYMENT ERROR ===', err);
       const errorMessage = err instanceof Error ? err.message : "Erro ao criar pagamento";
       setError(errorMessage);
+      setSubmitting(false);
       toast({
         title: "Erro ao criar pagamento",
         description: errorMessage,
         variant: "destructive",
       });
-    } finally {
-      setSubmitting(false);
     }
   };
 
