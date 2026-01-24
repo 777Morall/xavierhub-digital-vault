@@ -24,12 +24,18 @@ const SuccessPage = () => {
       setPurchase({
         transaction_id: "",
         purchase_code: purchaseCode,
+        license_key: "",
         payment_status: "paid",
         status: "active",
         product: { id: 0, name: "Produto Digital", type: "software" },
         price_paid: 0,
+        payment_method: "pix",
+        download_count: 0,
+        max_downloads: 5,
+        can_download: true,
+        access_expires_at: null,
         created_at: new Date().toISOString(),
-        can_download: true
+        updated_at: new Date().toISOString()
       });
       setLoading(false);
     } else {
