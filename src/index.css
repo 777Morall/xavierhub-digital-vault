@@ -6,53 +6,53 @@
 
 @layer base {
   :root {
-    --background: 160 10% 6%;
+    --background: 280 20% 6%;
     --foreground: 0 0% 98%;
 
-    --card: 160 10% 8%;
+    --card: 280 20% 8%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 160 10% 8%;
+    --popover: 280 20% 8%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 160 84% 45%;
-    --primary-foreground: 160 10% 6%;
+    --primary: 296 57% 43%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 160 10% 12%;
+    --secondary: 280 20% 12%;
     --secondary-foreground: 0 0% 98%;
 
-    --muted: 160 10% 15%;
-    --muted-foreground: 160 5% 55%;
+    --muted: 280 20% 15%;
+    --muted-foreground: 280 10% 55%;
 
-    --accent: 160 84% 50%;
-    --accent-foreground: 160 10% 6%;
+    --accent: 296 57% 48%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 160 10% 16%;
-    --input: 160 10% 16%;
-    --ring: 160 84% 45%;
+    --border: 280 20% 16%;
+    --input: 280 20% 16%;
+    --ring: 296 57% 43%;
 
     --radius: 0.75rem;
 
     /* Custom colors */
-    --glow-primary: 160 100% 50%;
-    --glow-secondary: 180 100% 45%;
+    --glow-primary: 296 100% 50%;
+    --glow-secondary: 280 100% 45%;
     --success: 160 84% 45%;
     --warning: 45 100% 50%;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(160 84% 45%) 0%, hsl(180 84% 50%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(160 10% 6%) 0%, hsl(160 20% 10%) 50%, hsl(160 10% 6%) 100%);
-    --gradient-card: linear-gradient(145deg, hsl(160 10% 10%) 0%, hsl(160 10% 7%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(160 100% 50% / 0.15) 0%, transparent 70%);
+    --gradient-primary: linear-gradient(135deg, hsl(296 57% 43%) 0%, hsl(280 70% 50%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(280 20% 6%) 0%, hsl(280 30% 10%) 50%, hsl(280 20% 6%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(280 20% 10%) 0%, hsl(280 20% 7%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(296 100% 50% / 0.15) 0%, transparent 70%);
 
     /* Shadows */
-    --shadow-glow: 0 0 30px hsl(160 100% 50% / 0.25);
-    --shadow-glow-lg: 0 0 60px hsl(160 100% 50% / 0.35);
+    --shadow-glow: 0 0 30px hsl(296 100% 50% / 0.25);
+    --shadow-glow-lg: 0 0 60px hsl(296 100% 50% / 0.35);
     --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.5);
-    --shadow-button: 0 0 20px hsl(160 84% 45% / 0.4);
+    --shadow-button: 0 0 20px hsl(296 57% 43% / 0.4);
   }
 }
 
@@ -95,7 +95,7 @@
   }
 
   .card-hover:hover {
-    box-shadow: 0 0 30px hsl(160 100% 50% / 0.1);
+    box-shadow: 0 0 30px hsl(296 100% 50% / 0.1);
   }
 
   .animate-float {
@@ -144,10 +144,10 @@
 
 @keyframes pulse-glow {
   0%, 100% { 
-    box-shadow: 0 0 20px hsl(160 100% 50% / 0.2);
+    box-shadow: 0 0 20px hsl(296 100% 50% / 0.2);
   }
   50% { 
-    box-shadow: 0 0 40px hsl(160 100% 50% / 0.4);
+    box-shadow: 0 0 40px hsl(296 100% 50% / 0.4);
   }
 }
 
@@ -185,20 +185,20 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(160 10% 8%);
+  background: hsl(280 20% 8%);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(160 84% 45%);
+  background: hsl(296 57% 43%);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(160 84% 55%);
+  background: hsl(296 57% 53%);
 }
 
 /* Selection */
 ::selection {
-  background: hsl(160 84% 45% / 0.3);
+  background: hsl(296 57% 43% / 0.3);
   color: hsl(0 0% 100%);
 }
