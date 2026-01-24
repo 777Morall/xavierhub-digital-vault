@@ -32,6 +32,7 @@ export interface PaymentData {
   value: number;
   value_cents: number;
   status: string;
+  webhook_url?: string;
   product: {
     id: number;
     name: string;
