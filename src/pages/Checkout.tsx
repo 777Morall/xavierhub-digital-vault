@@ -9,7 +9,10 @@ import {
   QrCode,
   Shield,
   Zap,
-  Clock
+  Clock,
+  Lock,
+  CreditCard,
+  CheckCircle2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +20,6 @@ import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getProduct, createPayment, generateUUID, Product, formatPrice } from "@/lib/api";
-import { toast } from "@/hooks/use-toast";
 
 const Checkout = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -75,10 +77,10 @@ const Checkout = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="flex items-center justify-center min-h-[60vh] pt-20">
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            <p className="text-muted-foreground">Carregando...</p>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="flex flex-col items-center gap-3">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-sm text-muted-foreground">Carregando...</p>
           </div>
         </div>
         <Footer />
@@ -90,7 +92,7 @@ const Checkout = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="flex flex-col items-center justify-center min-h-[60vh] pt-20 px-4">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
           <div className="card-glass rounded-2xl p-8 text-center max-w-md w-full animate-scale-in">
             <div className="w-16 h-16 rounded-full bg-destructive/20 flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="h-8 w-8 text-destructive" />
@@ -112,12 +114,12 @@ const Checkout = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="pt-20 pb-12">
+      <main className="pb-12">
         <div className="container mx-auto px-4">
           {/* Back Button */}
           <button 
             onClick={() => navigate(`/produto/${product.id}`)}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6 mt-4"
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors py-4"
           >
             <ArrowLeft className="h-4 w-4" />
             <span className="text-sm">Voltar ao produto</span>
@@ -126,7 +128,7 @@ const Checkout = () => {
           <div className="grid lg:grid-cols-5 gap-6 max-w-5xl mx-auto">
             {/* Order Summary - Left Column */}
             <div className="lg:col-span-2 order-2 lg:order-1">
-              <div className="card-glass rounded-2xl p-6 sticky top-24">
+              <div className="card-glass rounded-2xl p-6 lg:sticky lg:top-20">
                 <h2 className="font-display text-lg font-bold mb-4 flex items-center gap-2">
                   <ShoppingBag className="h-5 w-5 text-primary" />
                   Resumo do Pedido
@@ -134,46 +136,50 @@ const Checkout = () => {
                 
                 <div className="space-y-4">
                   {/* Product Card */}
-                  <div className="flex gap-4 p-4 bg-secondary/50 rounded-xl">
-                    <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
-                      <Zap className="h-7 w-7 text-primary" />
+                  <div className="flex gap-4 p-4 bg-secondary/50 rounded-xl border border-border/50">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center shrink-0">
+                      <Zap className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-foreground truncate">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground capitalize">{product.type}</p>
+                      <h3 className="font-semibold text-foreground text-sm leading-tight line-clamp-2">{product.name}</h3>
+                      <p className="text-xs text-muted-foreground capitalize mt-1">{product.type}</p>
                     </div>
                   </div>
 
                   {/* Price Breakdown */}
-                  <div className="space-y-3 pt-4 border-t border-border">
+                  <div className="space-y-2 pt-4 border-t border-border/50">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
                       <span className="text-foreground">{formatPrice(product.price)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Desconto PIX</span>
-                      <span className="text-primary">-R$ 0,00</span>
+                      <span className="text-muted-foreground">Taxa</span>
+                      <span className="text-primary">Grátis</span>
                     </div>
                   </div>
 
                   {/* Total */}
-                  <div className="flex justify-between items-center pt-4 border-t border-border">
-                    <span className="font-display font-bold text-lg">Total</span>
-                    <span className="font-display font-bold text-2xl text-primary">
+                  <div className="flex justify-between items-center pt-4 border-t border-border/50">
+                    <span className="font-display font-bold">Total</span>
+                    <span className="font-display font-bold text-2xl text-gradient">
                       {formatPrice(product.price)}
                     </span>
                   </div>
                 </div>
 
                 {/* Trust Badges */}
-                <div className="grid grid-cols-2 gap-3 mt-6">
-                  <div className="flex items-center gap-2 p-3 bg-secondary/50 rounded-lg">
-                    <Shield className="h-4 w-4 text-primary shrink-0" />
-                    <span className="text-xs text-muted-foreground">Compra Segura</span>
+                <div className="mt-6 space-y-2">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                    <span>Compra 100% segura</span>
                   </div>
-                  <div className="flex items-center gap-2 p-3 bg-secondary/50 rounded-lg">
-                    <Zap className="h-4 w-4 text-primary shrink-0" />
-                    <span className="text-xs text-muted-foreground">Entrega Imediata</span>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                    <span>Entrega imediata após pagamento</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                    <span>Suporte por e-mail</span>
                   </div>
                 </div>
               </div>
@@ -183,21 +189,26 @@ const Checkout = () => {
             <div className="lg:col-span-3 order-1 lg:order-2">
               <div className="card-glass rounded-2xl p-6 md:p-8">
                 {/* Header */}
-                <div className="mb-8">
-                  <h1 className="font-display text-2xl md:text-3xl font-bold mb-2">
-                    Finalizar Compra
-                  </h1>
-                  <p className="text-muted-foreground">
-                    Preencha seus dados para gerar o PIX
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <CreditCard className="h-4 w-4 text-primary" />
+                    </div>
+                    <h1 className="font-display text-xl md:text-2xl font-bold">
+                      Finalizar Compra
+                    </h1>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Preencha seu e-mail para receber o produto
                   </p>
                 </div>
 
-                <form onSubmit={handleCreatePayment} className="space-y-6">
+                <form onSubmit={handleCreatePayment} className="space-y-5">
                   {/* Email Input */}
                   <div className="space-y-2">
                     <Label htmlFor="email" className="flex items-center gap-2 text-sm font-medium">
                       <Mail className="h-4 w-4 text-primary" />
-                      E-mail para receber o produto
+                      E-mail
                     </Label>
                     <Input
                       id="email"
@@ -207,23 +218,24 @@ const Checkout = () => {
                       placeholder="seuemail@exemplo.com"
                       required
                       disabled={submitting}
-                      className="h-12 bg-secondary/50 border-border focus:border-primary transition-colors"
+                      className="h-12 bg-secondary/50 border-border/50 focus:border-primary transition-colors rounded-xl"
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Você receberá o acesso ao produto neste e-mail após a confirmação
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Lock className="h-3 w-3" />
+                      O produto será enviado para este e-mail
                     </p>
                   </div>
 
                   {/* Payment Method */}
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <Label className="text-sm font-medium">Método de Pagamento</Label>
-                    <div className="p-4 rounded-xl border-2 border-primary bg-primary/5 flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
-                        <QrCode className="h-6 w-6 text-primary" />
+                    <div className="p-4 rounded-xl border-2 border-primary bg-gradient-to-r from-primary/10 to-transparent flex items-center gap-4">
+                      <div className="w-11 h-11 rounded-xl bg-primary/20 flex items-center justify-center">
+                        <QrCode className="h-5 w-5 text-primary" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-foreground">PIX</p>
-                        <p className="text-sm text-muted-foreground">Aprovação instantânea</p>
+                        <p className="font-semibold text-foreground text-sm">PIX</p>
+                        <p className="text-xs text-muted-foreground">Aprovação instantânea</p>
                       </div>
                       <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
                         <div className="w-2 h-2 rounded-full bg-background" />
@@ -233,8 +245,8 @@ const Checkout = () => {
 
                   {/* Error Message */}
                   {error && (
-                    <div className="flex items-center gap-3 p-4 rounded-xl bg-destructive/10 border border-destructive/30">
-                      <AlertCircle className="h-5 w-5 text-destructive shrink-0" />
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-destructive/10 border border-destructive/30">
+                      <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
                       <p className="text-sm text-destructive">{error}</p>
                     </div>
                   )}
@@ -243,7 +255,7 @@ const Checkout = () => {
                   <Button 
                     type="submit" 
                     size="lg" 
-                    className="w-full h-14 text-base font-semibold glow-effect"
+                    className="w-full h-14 text-base font-bold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/25 transition-all duration-300 hover:shadow-xl hover:shadow-primary/35 hover:scale-[1.01] group"
                     disabled={submitting || !email}
                   >
                     {submitting ? (
@@ -255,14 +267,21 @@ const Checkout = () => {
                       <>
                         <QrCode className="h-5 w-5 mr-2" />
                         Gerar QR Code PIX
+                        <Zap className="h-4 w-4 ml-2 text-primary-foreground/70" />
                       </>
                     )}
                   </Button>
 
                   {/* Timer Info */}
-                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="h-4 w-4" />
+                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                    <Clock className="h-3.5 w-3.5" />
                     <span>O código PIX expira em 15 minutos</span>
+                  </div>
+
+                  {/* Security Badge */}
+                  <div className="flex items-center justify-center gap-2 pt-2">
+                    <Shield className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Pagamento seguro e criptografado</span>
                   </div>
                 </form>
               </div>
