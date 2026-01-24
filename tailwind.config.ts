@@ -7,15 +7,19 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1rem",
       screens: {
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
         "2xl": "1400px",
       },
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        display: ['Orbitron', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Space Grotesk', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -52,18 +56,18 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         glow: {
-          purple: "hsl(var(--glow-purple))",
-          magenta: "hsl(var(--glow-magenta))",
-        },
-        cyber: {
-          blue: "hsl(var(--cyber-blue))",
+          primary: "hsl(var(--glow-primary))",
+          secondary: "hsl(var(--glow-secondary))",
         },
         success: "hsl(var(--success))",
+        warning: "hsl(var(--warning))",
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "1rem",
+        "2xl": "1.5rem",
       },
       keyframes: {
         "accordion-down": {
@@ -78,16 +82,28 @@ export default {
           from: { transform: "translateX(0)" },
           to: { transform: "translateX(-50%)" },
         },
+        "shimmer": {
+          from: { backgroundPosition: "-200% 0" },
+          to: { backgroundPosition: "200% 0" },
+        },
+        "pulse-border": {
+          "0%, 100%": { borderColor: "hsl(160 84% 45% / 0.5)" },
+          "50%": { borderColor: "hsl(160 84% 45% / 1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "marquee": "marquee 30s linear infinite",
+        "shimmer": "shimmer 2s linear infinite",
+        "pulse-border": "pulse-border 2s ease-in-out infinite",
       },
       boxShadow: {
-        glow: "0 0 30px hsl(270 100% 65% / 0.3)",
-        "glow-lg": "0 0 50px hsl(270 100% 65% / 0.4)",
-        card: "0 4px 20px hsl(0 0% 0% / 0.4)",
+        glow: "0 0 30px hsl(160 100% 50% / 0.25)",
+        "glow-lg": "0 0 60px hsl(160 100% 50% / 0.35)",
+        "glow-sm": "0 0 15px hsl(160 100% 50% / 0.2)",
+        card: "0 4px 24px hsl(0 0% 0% / 0.5)",
+        "card-hover": "0 8px 40px hsl(0 0% 0% / 0.6)",
       },
     },
   },

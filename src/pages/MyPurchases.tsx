@@ -1,13 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Mail, Loader2, AlertCircle, Download, Package, Key, Clock, Check, X } from "lucide-react";
+import { 
+  Search, 
+  Package, 
+  Download, 
+  AlertCircle, 
+  Loader2,
+  Mail,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  ShoppingBag,
+  Key
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { getUserPurchases, getDownloadUrl, Purchase, formatPrice } from "@/lib/api";
+import { getUserPurchases, getDownloadUrl, formatPrice, Purchase } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
 const MyPurchases = () => {
@@ -20,17 +32,16 @@ const MyPurchases = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email) return;
-    
+    if (!email.trim()) return;
+
+    setLoading(true);
+    setError(null);
+    setSearched(true);
+
     try {
-      setLoading(true);
-      setError(null);
       const data = await getUserPurchases(email);
-      setPurchases(data.purchases);
-      setSearched(true);
-      
-      if (data.purchases.length === 0) {
+      setPurchases(data.purchases || []);
+      if (!data.purchases || data.purchases.length === 0) {
         toast({
           title: "Nenhuma compra encontrada",
           description: "Não encontramos compras associadas a este e-mail.",
@@ -40,7 +51,7 @@ const MyPurchases = () => {
       setError(err instanceof Error ? err.message : "Erro ao buscar compras");
       toast({
         title: "Erro",
-        description: err instanceof Error ? err.message : "Erro ao buscar compras",
+        description: "Não foi possível buscar suas compras.",
         variant: "destructive",
       });
     } finally {
@@ -58,153 +69,206 @@ const MyPurchases = () => {
 
   const getStatusBadge = (status: string, paymentStatus: string) => {
     if (paymentStatus === 'paid' && status === 'active') {
-      return <Badge className="bg-green-500/20 text-green-500 border-green-500/30">Ativo</Badge>;
-    } else if (paymentStatus === 'pending') {
-      return <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30">Pendente</Badge>;
-    } else {
-      return <Badge className="bg-red-500/20 text-red-500 border-red-500/30">Inativo</Badge>;
+      return (
+        <Badge className="bg-primary/20 text-primary border-primary/30 gap-1">
+          <CheckCircle2 className="h-3 w-3" />
+          Ativo
+        </Badge>
+      );
     }
+    if (paymentStatus === 'pending') {
+      return (
+        <Badge variant="outline" className="text-warning border-warning/30 gap-1">
+          <Clock className="h-3 w-3" />
+          Pendente
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="destructive" className="gap-1">
+        <XCircle className="h-3 w-3" />
+        Inativo
+      </Badge>
+    );
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="pt-24 pb-16">
+      <main className="pt-20 pb-12">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-2xl mx-auto">
             {/* Header */}
-            <div className="text-center mb-8">
-              <h1 className="font-display text-3xl md:text-4xl font-bold mb-2">
-                <span className="text-foreground">Meus </span>
-                <span className="text-gradient">Produtos</span>
+            <div className="text-center mb-8 mt-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+                <Package className="h-8 w-8 text-primary" />
+              </div>
+              <h1 className="font-display text-2xl md:text-3xl font-bold mb-2">
+                Meus Produtos
               </h1>
               <p className="text-muted-foreground">
-                Acesse suas compras e faça download dos seus produtos
+                Digite seu e-mail para ver suas compras
               </p>
             </div>
 
             {/* Search Form */}
-            <div className="bg-card rounded-xl border border-border p-6 mb-8">
-              <form onSubmit={handleSearch} className="space-y-4">
-                <div>
-                  <Label htmlFor="email" className="flex items-center gap-2 mb-2">
-                    <Mail className="h-4 w-4 text-primary" />
-                    E-mail da Compra
-                  </Label>
-                  <div className="flex gap-3">
-                    <Input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Digite o e-mail usado na compra"
-                      required
-                      className="bg-secondary border-border"
-                    />
-                    <Button type="submit" variant="glow" disabled={loading}>
-                      {loading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        "Buscar"
-                      )}
-                    </Button>
-                  </div>
+            <div className="card-glass rounded-2xl p-6 mb-6">
+              <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
+                <div className="flex-1 relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Digite seu e-mail"
+                    className="h-12 pl-12 bg-secondary/50 border-border"
+                    required
+                  />
                 </div>
+                <Button 
+                  type="submit" 
+                  className="h-12 px-6"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <>
+                      <Search className="h-5 w-5 mr-2" />
+                      Buscar
+                    </>
+                  )}
+                </Button>
               </form>
             </div>
 
             {/* Error State */}
             {error && (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-                <p className="text-muted-foreground">{error}</p>
+              <div className="card-glass rounded-2xl p-6 mb-6 flex items-center gap-4 border-destructive/30">
+                <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center shrink-0">
+                  <AlertCircle className="h-6 w-6 text-destructive" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Erro ao buscar</h3>
+                  <p className="text-sm text-muted-foreground">{error}</p>
+                </div>
               </div>
             )}
 
-            {/* Purchases List */}
-            {searched && !error && (
-              <div className="space-y-4">
+            {/* Results */}
+            {searched && !loading && (
+              <>
                 {purchases.length === 0 ? (
-                  <div className="text-center py-12">
-                    <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
-                      Nenhuma compra encontrada
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
+                  <div className="card-glass rounded-2xl p-8 text-center">
+                    <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+                      <ShoppingBag className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <h3 className="font-display text-xl font-bold mb-2">Nenhuma compra encontrada</h3>
+                    <p className="text-muted-foreground mb-6">
                       Não encontramos compras associadas a este e-mail.
                     </p>
-                    <Button variant="outline" onClick={() => navigate("/")}>
+                    <Button onClick={() => navigate("/")} className="glow-effect">
+                      <ShoppingBag className="h-4 w-4 mr-2" />
                       Ver Produtos
                     </Button>
                   </div>
                 ) : (
-                  purchases.map((purchase) => (
-                    <div
-                      key={purchase.id}
-                      className="bg-card rounded-xl border border-border p-6 hover:border-primary/50 transition-colors"
-                    >
-                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        {/* Product Info */}
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-semibold text-foreground">
-                              {purchase.product.name}
-                            </h3>
-                            {getStatusBadge(purchase.status, purchase.payment_status)}
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      {purchases.length} {purchases.length === 1 ? 'compra encontrada' : 'compras encontradas'}
+                    </p>
+                    
+                    {purchases.map((purchase) => (
+                      <div 
+                        key={purchase.purchase_code}
+                        className="card-glass rounded-2xl p-6 card-hover"
+                      >
+                        {/* Header */}
+                        <div className="flex items-start justify-between gap-4 mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
+                              <Package className="h-6 w-6 text-primary" />
+                            </div>
+                            <div className="min-w-0">
+                              <h3 className="font-semibold text-foreground truncate">
+                                {purchase.product.name}
+                              </h3>
+                              <p className="text-sm text-muted-foreground capitalize">
+                                {purchase.product.type}
+                              </p>
+                            </div>
                           </div>
-                          
-                          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4" />
-                              {new Date(purchase.created_at).toLocaleDateString('pt-BR')}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Download className="h-4 w-4" />
-                              {purchase.download_count}/{purchase.max_downloads} downloads
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Key className="h-4 w-4" />
-                              <span className="font-mono text-xs">{purchase.purchase_code}</span>
-                            </div>
+                          {getStatusBadge(purchase.status, purchase.payment_status)}
+                        </div>
+
+                        {/* Details */}
+                        <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Calendar className="h-4 w-4" />
+                            <span>{new Date(purchase.created_at).toLocaleDateString('pt-BR')}</span>
+                          </div>
+                          <div className="text-right">
+                            <span className="font-display font-bold text-primary">
+                              {formatPrice(purchase.price_paid)}
+                            </span>
                           </div>
                         </div>
 
-                        {/* Price & Actions */}
-                        <div className="flex items-center gap-4">
-                          <span className="text-lg font-bold text-gradient">
-                            {formatPrice(purchase.price_paid)}
-                          </span>
-                          
-                          {purchase.can_download ? (
+                        {/* Purchase Code */}
+                        <div className="p-3 bg-secondary/50 rounded-lg mb-4">
+                          <p className="text-xs text-muted-foreground mb-1">Código da compra</p>
+                          <p className="font-mono text-sm text-foreground truncate">
+                            {purchase.purchase_code}
+                          </p>
+                        </div>
+
+                        {/* Download Info */}
+                        {purchase.can_download && purchase.payment_status === 'paid' && (
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs text-muted-foreground">
+                              Downloads: {purchase.download_count}/{purchase.max_downloads}
+                            </p>
                             <Button 
-                              variant="glow"
                               onClick={() => handleDownload(purchase.purchase_code)}
+                              size="sm"
+                              className="glow-effect"
                             >
                               <Download className="h-4 w-4 mr-2" />
                               Baixar
                             </Button>
-                          ) : (
-                            <Button variant="outline" disabled>
-                              <X className="h-4 w-4 mr-2" />
-                              Limite Atingido
-                            </Button>
-                          )}
-                        </div>
-                      </div>
+                          </div>
+                        )}
 
-                      {/* License Key */}
-                      {purchase.license_key && (
-                        <div className="mt-4 pt-4 border-t border-border">
-                          <Label className="text-xs text-muted-foreground">Chave de Licença</Label>
-                          <p className="font-mono text-sm text-foreground bg-secondary px-3 py-2 rounded mt-1">
-                            {purchase.license_key}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  ))
+                        {/* License Key */}
+                        {purchase.license_key && (
+                          <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
+                              <Key className="h-3 w-3" />
+                              Chave de Licença
+                            </p>
+                            <p className="font-mono text-sm text-primary">
+                              {purchase.license_key}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )}
+              </>
+            )}
+
+            {/* Initial State */}
+            {!searched && !loading && (
+              <div className="card-glass rounded-2xl p-8 text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <Search className="h-8 w-8 text-primary" />
+                </div>
+                <h3 className="font-display text-xl font-bold mb-2">Busque suas compras</h3>
+                <p className="text-muted-foreground">
+                  Digite o e-mail usado na compra para ver seus produtos
+                </p>
               </div>
             )}
           </div>
