@@ -120,7 +120,7 @@ const SuccessPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="pt-14 pb-12">
+      <main className="pt-16 pb-12">
         <div className="container mx-auto px-4">
           <div className="max-w-lg mx-auto space-y-6 animate-fade-in">
             {/* Success Header */}
