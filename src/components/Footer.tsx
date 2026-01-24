@@ -14,12 +14,9 @@ const Footer = () => {
   return (
     <footer id="contato" className="border-t border-border bg-card/50 mt-12">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          {/* Logo & Brand */}
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="XavierHub" className="h-8 w-auto" />
-            <span className="font-display font-bold text-lg">XAVIERHUB</span>
-          </div>
+        <div className="flex flex-col items-center gap-6">
+          {/* Logo Centered */}
+          <img src={logo} alt="XavierHub" className="h-16 w-auto" />
 
           {/* Social Links */}
           <div className="flex items-center gap-3">
