@@ -235,18 +235,26 @@ const MyPurchases = () => {
 
                         {/* Download Info */}
                         {purchase.can_download && purchase.payment_status === 'paid' && purchase.download && (
-                          <div className="flex items-center justify-between">
-                            <p className="text-xs text-muted-foreground">
-                              Downloads: {purchase.download_count}/{purchase.max_downloads}
-                            </p>
-                            <Button 
-                              onClick={() => handleDownload(purchase.download!.url)}
-                              size="sm"
-                              className="glow-effect"
-                            >
-                              <Download className="h-4 w-4 mr-2" />
-                              Baixar
-                            </Button>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <p className="text-xs text-muted-foreground">
+                                Downloads: {purchase.download_count}/{purchase.max_downloads}
+                              </p>
+                              <Button 
+                                onClick={() => handleDownload(purchase.download!.url)}
+                                size="sm"
+                                className="glow-effect"
+                              >
+                                <Download className="h-4 w-4 mr-2" />
+                                Baixar
+                              </Button>
+                            </div>
+                            <div className="p-3 bg-secondary/50 rounded-lg">
+                              <p className="text-xs text-muted-foreground mb-1">URL do arquivo</p>
+                              <p className="font-mono text-xs text-foreground break-all">
+                                {purchase.download.url}
+                              </p>
+                            </div>
                           </div>
                         )}
 
