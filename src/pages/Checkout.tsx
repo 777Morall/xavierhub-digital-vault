@@ -57,10 +57,18 @@ const Checkout = () => {
       setState('generating');
       setError(null);
       
+      console.log('Creating payment for product:', product.id, 'email:', email);
+      
       const paymentData = await createPayment(product.id, email);
-      console.log('Payment created:', paymentData);
-      console.log('QR Code Base64:', paymentData.qr_code_base64?.substring(0, 50));
-      console.log('QR Code:', paymentData.qr_code?.substring(0, 50));
+      
+      console.log('=== PAYMENT RESPONSE ===');
+      console.log('Full response:', JSON.stringify(paymentData, null, 2));
+      console.log('QR Code exists:', !!paymentData.qr_code);
+      console.log('QR Code Base64 exists:', !!paymentData.qr_code_base64);
+      
+      if (!paymentData.qr_code || !paymentData.qr_code_base64) {
+        throw new Error('API não retornou QR Code. Verifique a resposta da API.');
+      }
       
       setPayment(paymentData);
       setState('pending');
@@ -73,11 +81,13 @@ const Checkout = () => {
         description: "Escaneie o QR Code ou copie o código para pagar.",
       });
     } catch (err) {
+      console.error('=== PAYMENT ERROR ===', err);
       setState('error');
-      setError(err instanceof Error ? err.message : "Erro ao gerar PIX");
+      const errorMessage = err instanceof Error ? err.message : "Erro ao gerar PIX";
+      setError(errorMessage);
       toast({
         title: "Erro ao gerar PIX",
-        description: err instanceof Error ? err.message : "Tente novamente",
+        description: errorMessage,
         variant: "destructive",
       });
     }
