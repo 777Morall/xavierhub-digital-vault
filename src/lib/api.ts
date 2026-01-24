@@ -30,6 +30,7 @@ export interface PaymentData {
   qr_code: string;
   qr_code_base64: string;
   value: number;
+  value_cents: number;
   status: string;
   product: {
     id: number;
@@ -41,16 +42,23 @@ export interface PaymentData {
 export interface PaymentStatus {
   transaction_id: string;
   purchase_code: string;
+  license_key: string;
   payment_status: 'pending' | 'paid' | 'cancelled' | 'expired' | 'refunded';
   status: string;
   product: {
     id: number;
     name: string;
     type: string;
+    image?: string;
   };
   price_paid: number;
-  created_at: string;
+  payment_method: string;
+  download_count: number;
+  max_downloads: number;
   can_download: boolean;
+  access_expires_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Purchase {
