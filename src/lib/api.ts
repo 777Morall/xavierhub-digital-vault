@@ -5,15 +5,17 @@ export interface Product {
   merchant_id: number;
   name: string;
   description: string;
-  price: string;
+  image?: string;
+  price: number;
   status: string;
   type: string;
   delivery_type: string;
+  delivery_info?: string;
+  access_duration?: string;
   slug: string;
-  file_path?: string;
   demo_url?: string;
-  merchant_name: string;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface PaymentData {
@@ -150,9 +152,8 @@ export function getDownloadUrl(purchaseCode: string): string {
 }
 
 // Formatar preço
-export function formatPrice(price: string | number): string {
-  const numPrice = typeof price === 'string' ? parseFloat(price) : price;
-  return numPrice.toLocaleString('pt-BR', {
+export function formatPrice(price: number): string {
+  return price.toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL'
   });

@@ -80,7 +80,8 @@ const ProductDetail = () => {
     );
   }
 
-  const imageUrl = product.file_path || getDefaultImage(product.type);
+  const imageUrl = product.image || getDefaultImage(product.type);
+  const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
 
   return (
     <div className="min-h-screen bg-background">
@@ -131,10 +132,10 @@ const ProductDetail = () => {
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-6">
                 <span className="text-4xl font-bold text-gradient">
-                  {formatPrice(product.price)}
+                  {formatPrice(price)}
                 </span>
                 <span className="text-lg text-muted-foreground line-through">
-                  {formatPrice(parseFloat(product.price) * 2)}
+                  {formatPrice(price * 2)}
                 </span>
                 <Badge className="bg-accent text-accent-foreground">
                   50% OFF
@@ -205,9 +206,9 @@ const ProductDetail = () => {
                 )}
               </div>
 
-              {/* Merchant Info */}
+              {/* Product Info */}
               <p className="text-sm text-muted-foreground mt-6">
-                Vendido por: <span className="text-foreground font-medium">{product.merchant_name}</span>
+                Entrega: <span className="text-foreground font-medium">{product.delivery_info || 'Download imediato'}</span>
               </p>
             </div>
           </div>
