@@ -116,15 +116,17 @@ const ProductDetail = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="pb-16">
+      <main className="pt-16 pb-16">
         <div className="container mx-auto px-4">
           {/* Back Button */}
           <button 
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors py-4"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors py-4 group"
           >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="text-sm">Voltar</span>
+            <div className="w-8 h-8 rounded-full bg-secondary/80 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <ArrowLeft className="h-4 w-4 group-hover:text-primary transition-colors" />
+            </div>
+            <span>Voltar</span>
           </button>
 
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
