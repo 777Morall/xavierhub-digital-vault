@@ -1,86 +1,110 @@
-import { Code, Layout, Bot, Package, Terminal, Cpu } from "lucide-react";
+import { 
+  Tv, 
+  Package, 
+  Crown, 
+  Gamepad2, 
+  MonitorSmartphone, 
+  Key, 
+  Briefcase,
+  LucideIcon
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const categories = [
+interface Category {
+  icon: LucideIcon;
+  name: string;
+  slug: string;
+  gradient: string;
+}
+
+const categories: Category[] = [
   {
-    icon: Code,
-    name: "Scripts",
-    count: 45,
-    color: "from-purple-500 to-pink-500",
-  },
-  {
-    icon: Layout,
-    name: "Telas",
-    count: 32,
-    color: "from-blue-500 to-cyan-500",
-  },
-  {
-    icon: Bot,
-    name: "Bots",
-    count: 28,
-    color: "from-green-500 to-emerald-500",
+    icon: Tv,
+    name: "STREAMINGS",
+    slug: "streaming",
+    gradient: "from-red-500 to-rose-600",
   },
   {
     icon: Package,
-    name: "Packs",
-    count: 15,
-    color: "from-orange-500 to-yellow-500",
+    name: "COMBOS",
+    slug: "combo",
+    gradient: "from-blue-500 to-indigo-600",
   },
   {
-    icon: Terminal,
-    name: "Ferramentas",
-    count: 38,
-    color: "from-red-500 to-pink-500",
+    icon: Crown,
+    name: "ASSINATURAS",
+    slug: "assinatura",
+    gradient: "from-amber-500 to-orange-600",
   },
   {
-    icon: Cpu,
-    name: "Sistemas",
-    count: 22,
-    color: "from-violet-500 to-purple-500",
+    icon: Gamepad2,
+    name: "JOGOS",
+    slug: "jogos",
+    gradient: "from-green-500 to-emerald-600",
+  },
+  {
+    icon: MonitorSmartphone,
+    name: "PAINEIS",
+    slug: "painel",
+    gradient: "from-purple-500 to-violet-600",
+  },
+  {
+    icon: Key,
+    name: "MÉTODOS",
+    slug: "metodos",
+    gradient: "from-cyan-500 to-teal-600",
+  },
+  {
+    icon: Briefcase,
+    name: "TRABALHO",
+    slug: "trabalho",
+    gradient: "from-pink-500 to-rose-600",
   },
 ];
 
 const CategoriesSection = () => {
+  const navigate = useNavigate();
+
   return (
-    <section id="categorias" className="py-20 relative">
+    <section id="categorias" className="py-8">
       <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className="font-display text-3xl md:text-4xl font-bold">
-            <span className="text-foreground">Nossas </span>
-            <span className="text-gradient">Categorias</span>
-          </h2>
-          <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
-            Encontre exatamente o que você precisa em nossas categorias
-          </p>
-        </div>
+        {/* Section Title */}
+        <h2 className="font-display text-xl md:text-2xl font-bold text-foreground mb-6">
+          Categorias populares
+        </h2>
 
-        {/* Categories Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((category, index) => (
-            <div
-              key={category.name}
-              className="group cursor-pointer animate-slide-up"
-              style={{ animationDelay: `${index * 0.1}s` }}
+        {/* Categories Horizontal Scroll */}
+        <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-7">
+          {categories.map((category) => (
+            <button
+              key={category.slug}
+              onClick={() => {
+                // Scroll to products and filter by category
+                const element = document.getElementById('produtos');
+                element?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="group flex-shrink-0 w-32 md:w-auto"
             >
-              <div className="relative p-6 rounded-xl bg-card border border-border hover:border-primary/50 transition-all duration-300 text-center card-glow">
-                {/* Icon with Gradient Background */}
-                <div
-                  className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${category.color} mb-4 group-hover:scale-110 transition-transform duration-300`}
-                >
-                  <category.icon className="h-7 w-7 text-white" />
-                </div>
-
-                <h3 className="font-semibold text-foreground mb-1">
+              <div className={`
+                relative aspect-square rounded-2xl overflow-hidden
+                bg-gradient-to-br ${category.gradient}
+                p-4 flex flex-col items-center justify-center
+                transition-all duration-300
+                group-hover:scale-105 group-hover:shadow-lg
+                border border-primary/20
+              `}>
+                {/* Icon */}
+                <category.icon className="h-8 w-8 md:h-10 md:w-10 text-white mb-2 drop-shadow-lg" />
+                
+                {/* Name */}
+                <span className="font-display text-xs md:text-sm font-bold text-white text-center leading-tight drop-shadow">
                   {category.name}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {category.count} produtos
-                </p>
+                </span>
 
-                {/* Hover Glow */}
-                <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-glow" />
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/10" />
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </div>
