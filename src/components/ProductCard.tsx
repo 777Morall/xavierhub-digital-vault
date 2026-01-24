@@ -12,7 +12,7 @@ interface ProductCardProps {
 const ProductCard = ({ product, discount }: ProductCardProps) => {
   const navigate = useNavigate();
   
-  const price = parseFloat(product.price);
+  const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
   const originalPrice = discount ? price / (1 - discount / 100) : undefined;
 
   // Imagem padrão baseada no tipo
@@ -27,7 +27,7 @@ const ProductCard = ({ product, discount }: ProductCardProps) => {
     return images[type] || images.outro;
   };
 
-  const imageUrl = product.file_path || getDefaultImage(product.type);
+  const imageUrl = product.image || getDefaultImage(product.type);
 
   return (
     <div className="group relative bg-card rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 card-glow">
