@@ -94,7 +94,7 @@ const CategoriesSection = () => {
                 border border-primary/20
               `}>
                 {/* Icon */}
-                <category.icon className="h-8 w-8 md:h-10 md:w-10 text-white mb-2 drop-shadow-lg" />
+                <category.icon className="h-5 w-5 md:h-6 md:w-6 text-white mb-2 drop-shadow-lg" />
                 
                 {/* Name */}
                 <span className="font-display text-xs md:text-sm font-bold text-white text-center leading-tight drop-shadow">

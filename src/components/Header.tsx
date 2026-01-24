@@ -50,7 +50,7 @@ const Header = () => {
             onClick={() => navigate("/")} 
             className="flex items-center gap-2 shrink-0"
           >
-            <img src={logo} alt="XavierHub" className="h-8 w-auto" />
+            <img src={logo} alt="XavierHub" className="h-12 w-auto" />
           </button>
 
           {/* Search Bar - Desktop */}
