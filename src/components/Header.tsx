@@ -1,51 +1,81 @@
 import { useState } from "react";
-import { Menu, X, ShoppingCart, User } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Menu, X, ShoppingCart, User, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navLinks = [
-    { name: "Início", href: "#" },
-    { name: "Produtos", href: "#produtos" },
-    { name: "Categorias", href: "#categorias" },
-    { name: "Contato", href: "#contato" },
+    { name: "Início", href: "/" },
+    { name: "Produtos", href: "/#produtos" },
+    { name: "Categorias", href: "/#categorias" },
+    { name: "Contato", href: "/#contato" },
   ];
+
+  const handleNavClick = (href: string) => {
+    setIsMenuOpen(false);
+    if (href.startsWith("/#")) {
+      if (location.pathname !== "/") {
+        navigate("/");
+        setTimeout(() => {
+          const element = document.querySelector(href.replace("/", ""));
+          element?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      } else {
+        const element = document.querySelector(href.replace("/", ""));
+        element?.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      navigate(href);
+    }
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2">
+          <button onClick={() => navigate("/")} className="flex items-center gap-2">
             <img src={logo} alt="XavierHub" className="h-10 w-auto" />
             <span className="font-display font-bold text-xl text-gradient hidden sm:block">
               XAVIERHUB
             </span>
-          </a>
+          </button>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
-              <a
+              <button
                 key={link.name}
-                href={link.href}
+                onClick={() => handleNavClick(link.href)}
                 className="text-muted-foreground hover:text-primary transition-colors font-medium"
               >
                 {link.name}
-              </a>
+              </button>
             ))}
           </nav>
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="hidden md:flex">
-              <ShoppingCart className="h-5 w-5" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="hidden md:flex"
+              onClick={() => navigate("/meus-produtos")}
+            >
+              <Package className="h-5 w-5" />
             </Button>
-            <Button variant="glow" className="hidden md:flex">
+            <Button 
+              variant="glow" 
+              className="hidden md:flex"
+              onClick={() => navigate("/meus-produtos")}
+            >
               <User className="h-4 w-4 mr-2" />
-              Entrar
+              Meus Produtos
             </Button>
 
             {/* Mobile Menu Toggle */}
@@ -64,18 +94,24 @@ const Header = () => {
         {isMenuOpen && (
           <nav className="md:hidden py-4 border-t border-border animate-slide-up">
             {navLinks.map((link) => (
-              <a
+              <button
                 key={link.name}
-                href={link.href}
-                className="block py-3 text-muted-foreground hover:text-primary transition-colors font-medium"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => handleNavClick(link.href)}
+                className="block w-full text-left py-3 text-muted-foreground hover:text-primary transition-colors font-medium"
               >
                 {link.name}
-              </a>
+              </button>
             ))}
-            <Button variant="glow" className="w-full mt-4">
+            <Button 
+              variant="glow" 
+              className="w-full mt-4"
+              onClick={() => {
+                setIsMenuOpen(false);
+                navigate("/meus-produtos");
+              }}
+            >
               <User className="h-4 w-4 mr-2" />
-              Entrar
+              Meus Produtos
             </Button>
           </nav>
         )}
