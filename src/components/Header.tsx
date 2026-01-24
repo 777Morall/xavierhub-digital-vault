@@ -1,36 +1,14 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, Search, ShoppingCart, User } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Menu, X, Search, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { isAuthenticated, getStoredUser, logout } from "@/lib/auth";
-import type { User as UserType } from "@/lib/auth";
 import logo from "@/assets/logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<UserType | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    if (isAuthenticated()) {
-      setUser(getStoredUser());
-    }
-  }, [location]);
-
-  const handleLogout = () => {
-    logout();
-    setUser(null);
-  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,46 +50,13 @@ const Header = () => {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <User className="h-4 w-4" />
-                    <span className="hidden sm:inline">{user.username}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={() => navigate("/meus-produtos")}>
-                    Meus Produtos
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/perfil")}>
-                    Configurações
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                    Sair
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => navigate("/login")}
-                className="gap-2"
-              >
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">Entrar</span>
-              </Button>
-            )}
-
             <Button 
               size="sm"
               onClick={() => navigate("/meus-produtos")}
               className="gap-2 bg-primary hover:bg-primary/90"
             >
               <ShoppingCart className="h-4 w-4" />
-              <span className="hidden sm:inline">Carrinho</span>
+              <span className="hidden sm:inline">Minhas Compras</span>
             </Button>
 
             {/* Mobile Menu Toggle */}
@@ -148,17 +93,8 @@ const Header = () => {
                 className="w-full justify-start"
                 onClick={() => { setIsMenuOpen(false); navigate("/meus-produtos"); }}
               >
-                Meus Produtos
+                Minhas Compras
               </Button>
-              {!user && (
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start"
-                  onClick={() => { setIsMenuOpen(false); navigate("/login"); }}
-                >
-                  Entrar
-                </Button>
-              )}
             </div>
           </div>
         )}
