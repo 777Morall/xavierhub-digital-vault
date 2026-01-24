@@ -1,8 +1,20 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Check, Download, Copy, ArrowLeft, Package, Key, Loader2, AlertCircle } from "lucide-react";
+import { 
+  Check, 
+  Download, 
+  Copy, 
+  ArrowLeft, 
+  Package,
+  Loader2, 
+  AlertCircle,
+  PartyPopper,
+  Mail,
+  ExternalLink,
+  Shield,
+  Clock
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { checkPayment, getDownloadUrl, PaymentStatus, formatPrice } from "@/lib/api";
@@ -20,7 +32,6 @@ const SuccessPage = () => {
 
   useEffect(() => {
     if (purchaseCode) {
-      // Buscar informações da compra via transaction_id ou usar o purchase_code
       setPurchase({
         transaction_id: "",
         purchase_code: purchaseCode,
@@ -72,8 +83,11 @@ const SuccessPage = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="flex items-center justify-center min-h-[60vh] pt-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="flex items-center justify-center min-h-[70vh] pt-20">
+          <div className="card-glass rounded-2xl p-8 text-center animate-scale-in">
+            <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-muted-foreground">Carregando...</p>
+          </div>
         </div>
         <Footer />
       </div>
@@ -84,14 +98,18 @@ const SuccessPage = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="flex flex-col items-center justify-center min-h-[60vh] pt-20">
-          <AlertCircle className="h-12 w-12 text-destructive mb-4" />
-          <h1 className="text-xl font-semibold mb-2">Compra não encontrada</h1>
-          <p className="text-muted-foreground mb-4">{error}</p>
-          <Button variant="outline" onClick={() => navigate("/")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Voltar ao Catálogo
-          </Button>
+        <div className="flex flex-col items-center justify-center min-h-[70vh] pt-20 px-4">
+          <div className="card-glass rounded-2xl p-8 text-center max-w-md w-full animate-scale-in">
+            <div className="w-16 h-16 rounded-full bg-destructive/20 flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="h-8 w-8 text-destructive" />
+            </div>
+            <h1 className="font-display text-xl font-bold mb-2">Compra não encontrada</h1>
+            <p className="text-muted-foreground mb-6">{error}</p>
+            <Button onClick={() => navigate("/")} className="w-full">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar ao Catálogo
+            </Button>
+          </div>
         </div>
         <Footer />
       </div>
@@ -102,99 +120,132 @@ const SuccessPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="pt-24 pb-16">
+      <main className="pt-20 pb-12">
         <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto">
-            {/* Success Icon */}
-            <div className="flex justify-center mb-8">
-              <div className="relative">
-                <div className="w-24 h-24 rounded-full bg-green-500/20 flex items-center justify-center animate-pulse-glow">
-                  <Check className="h-12 w-12 text-green-500" />
+          <div className="max-w-lg mx-auto space-y-6 animate-fade-in">
+            {/* Success Header */}
+            <div className="card-glass rounded-2xl p-8 text-center">
+              {/* Animated Success Icon */}
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-28 h-28 bg-primary/20 rounded-full animate-ping" style={{ animationDuration: '2s' }} />
                 </div>
-                <div className="absolute inset-0 rounded-full bg-green-500/20 animate-ping" />
+                <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center mx-auto glow-effect">
+                  <Check className="h-12 w-12 text-primary-foreground" />
+                </div>
               </div>
-            </div>
 
-            {/* Success Message */}
-            <div className="text-center mb-8">
-              <h1 className="font-display text-3xl md:text-4xl font-bold mb-4">
-                <span className="text-foreground">Pagamento </span>
-                <span className="text-gradient">Confirmado!</span>
+              {/* Celebration */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
+                <PartyPopper className="h-4 w-4" />
+                <span>Pagamento Aprovado</span>
+              </div>
+
+              <h1 className="font-display text-2xl md:text-3xl font-bold mb-2">
+                Compra Realizada!
               </h1>
-              <p className="text-lg text-muted-foreground">
-                Sua compra foi realizada com sucesso. Obrigado por escolher a XavierHub!
+              <p className="text-muted-foreground">
+                Obrigado por comprar na XavierHub
               </p>
             </div>
 
-            {/* Purchase Info Card */}
-            <div className="bg-card rounded-xl border border-border p-6 mb-6 space-y-6">
-              {/* Purchase Code */}
-              <div>
-                <label className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
-                  <Package className="h-4 w-4 text-primary" />
-                  Código da Compra
-                </label>
-                <div className="flex gap-2">
-                  <Input
-                    value={purchaseCode || ""}
-                    readOnly
-                    className="bg-secondary border-border font-mono"
-                  />
-                  <Button 
-                    variant="outline"
-                    onClick={handleCopyCode}
-                    className="shrink-0"
-                  >
-                    {copiedCode ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
+            {/* Purchase Code Card */}
+            <div className="card-glass rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                  <Package className="h-5 w-5 text-primary" />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Guarde este código para acessar seu produto a qualquer momento
-                </p>
+                <div>
+                  <p className="text-sm text-muted-foreground">Código da Compra</p>
+                  <p className="font-display font-bold text-foreground">Guarde com você!</p>
+                </div>
               </div>
 
-              {/* Status */}
-              <div className="flex items-center justify-between p-4 rounded-lg bg-green-500/10 border border-green-500/30">
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span className="text-foreground font-medium">Pagamento Aprovado</span>
+              <div className="relative">
+                <div className="p-4 pr-24 bg-secondary/50 rounded-xl font-mono text-sm text-foreground break-all">
+                  {purchaseCode}
                 </div>
-                <span className="text-sm text-green-500 font-semibold">PIX</span>
+                <Button 
+                  onClick={handleCopyCode}
+                  variant="outline"
+                  size="sm"
+                  className="absolute right-2 top-1/2 -translate-y-1/2"
+                >
+                  {copiedCode ? (
+                    <>
+                      <Check className="h-4 w-4 mr-1 text-primary" />
+                      Copiado
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-1" />
+                      Copiar
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              <p className="text-xs text-muted-foreground mt-3 flex items-center gap-2">
+                <Shield className="h-3 w-3" />
+                Use este código para acessar seu produto a qualquer momento
+              </p>
+            </div>
+
+            {/* Download Card */}
+            <div className="card-glass rounded-2xl p-6">
+              <h3 className="font-display font-bold text-lg mb-4 flex items-center gap-2">
+                <Download className="h-5 w-5 text-primary" />
+                Baixar Produto
+              </h3>
+
+              <Button 
+                onClick={handleDownload}
+                size="lg"
+                className="w-full h-14 text-base font-semibold glow-effect"
+              >
+                <Download className="h-5 w-5 mr-2" />
+                Fazer Download Agora
+              </Button>
+
+              <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  <span>Acesso imediato</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Shield className="h-4 w-4" />
+                  <span>Download seguro</span>
+                </div>
               </div>
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <Button 
-                variant="glow" 
-                size="lg" 
-                className="flex-1"
-                onClick={handleDownload}
+                variant="outline"
+                onClick={() => navigate("/meus-produtos")}
+                className="h-12"
               >
-                <Download className="h-5 w-5 mr-2" />
-                Baixar Produto
+                <Package className="h-4 w-4 mr-2" />
+                Meus Produtos
               </Button>
               
               <Button 
-                variant="outline" 
-                size="lg"
-                onClick={() => navigate("/meus-produtos")}
+                variant="outline"
+                onClick={() => navigate("/")}
+                className="h-12"
               >
-                <Key className="h-5 w-5 mr-2" />
-                Meus Produtos
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Ver Catálogo
               </Button>
             </div>
 
-            {/* Help Text */}
-            <div className="mt-8 text-center">
+            {/* Help */}
+            <div className="text-center">
               <p className="text-sm text-muted-foreground">
                 Problemas com o download?{" "}
-                <a href="#contato" className="text-primary hover:underline">
-                  Entre em contato conosco
+                <a href="#contato" className="text-primary hover:underline font-medium">
+                  Entre em contato
                 </a>
               </p>
             </div>

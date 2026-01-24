@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, User, Package, LogIn, LogOut, Settings } from "lucide-react";
+import { Menu, X, User, Package, LogIn, LogOut, Settings, ShoppingCart, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -56,24 +56,24 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-xl border-b border-border/50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <button onClick={() => navigate("/")} className="flex items-center gap-2">
-            <img src={logo} alt="XavierHub" className="h-10 w-auto" />
-            <span className="font-display font-bold text-xl text-gradient hidden sm:block">
+          <button onClick={() => navigate("/")} className="flex items-center gap-3 group">
+            <img src={logo} alt="XavierHub" className="h-9 w-auto" />
+            <span className="font-display font-bold text-lg hidden sm:block group-hover:text-primary transition-colors">
               XAVIERHUB
             </span>
           </button>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <button
                 key={link.name}
                 onClick={() => handleNavClick(link.href)}
-                className="text-muted-foreground hover:text-primary transition-colors font-medium"
+                className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-lg transition-all font-medium"
               >
                 {link.name}
               </button>
@@ -81,7 +81,7 @@ const Header = () => {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {user ? (
               <>
                 <Button 
@@ -95,7 +95,7 @@ const Header = () => {
                 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="glow" className="hidden md:flex">
+                    <Button variant="default" size="sm" className="hidden md:flex">
                       <User className="h-4 w-4 mr-2" />
                       {user.username}
                     </Button>
@@ -121,18 +121,19 @@ const Header = () => {
               <>
                 <Button 
                   variant="ghost" 
+                  size="sm"
                   className="hidden md:flex"
                   onClick={() => navigate("/login")}
                 >
-                  <LogIn className="h-4 w-4 mr-2" />
                   Entrar
                 </Button>
                 <Button 
-                  variant="glow" 
+                  size="sm"
                   className="hidden md:flex"
                   onClick={() => navigate("/registrar")}
                 >
-                  Criar Conta
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Carrinho
                 </Button>
               </>
             )}
@@ -151,78 +152,58 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <nav className="md:hidden py-4 border-t border-border animate-slide-up">
-            {navLinks.map((link) => (
-              <button
-                key={link.name}
-                onClick={() => handleNavClick(link.href)}
-                className="block w-full text-left py-3 text-muted-foreground hover:text-primary transition-colors font-medium"
-              >
-                {link.name}
-              </button>
-            ))}
+          <nav className="md:hidden py-4 border-t border-border/50 animate-fade-in">
+            <div className="space-y-1">
+              {navLinks.map((link) => (
+                <button
+                  key={link.name}
+                  onClick={() => handleNavClick(link.href)}
+                  className="block w-full text-left px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-secondary/50 rounded-lg transition-all font-medium"
+                >
+                  {link.name}
+                </button>
+              ))}
+            </div>
             
-            {user ? (
-              <div className="mt-4 space-y-2">
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    navigate("/meus-produtos");
-                  }}
-                >
-                  <Package className="h-4 w-4 mr-2" />
-                  Meus Produtos
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    navigate("/perfil");
-                  }}
-                >
-                  <Settings className="h-4 w-4 mr-2" />
-                  Configurações
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full text-destructive"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    handleLogout();
-                  }}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Sair
-                </Button>
-              </div>
-            ) : (
-              <div className="mt-4 space-y-2">
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    navigate("/login");
-                  }}
-                >
-                  <LogIn className="h-4 w-4 mr-2" />
-                  Entrar
-                </Button>
-                <Button 
-                  variant="glow" 
-                  className="w-full"
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    navigate("/registrar");
-                  }}
-                >
-                  Criar Conta
-                </Button>
-              </div>
-            )}
+            <div className="mt-4 pt-4 border-t border-border/50 space-y-2">
+              {user ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => { setIsMenuOpen(false); navigate("/meus-produtos"); }}
+                  >
+                    <Package className="h-4 w-4 mr-2" />
+                    Meus Produtos
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start text-destructive"
+                    onClick={() => { setIsMenuOpen(false); handleLogout(); }}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sair
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => { setIsMenuOpen(false); navigate("/login"); }}
+                  >
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Entrar
+                  </Button>
+                  <Button 
+                    className="w-full"
+                    onClick={() => { setIsMenuOpen(false); navigate("/registrar"); }}
+                  >
+                    Criar Conta
+                  </Button>
+                </>
+              )}
+            </div>
           </nav>
         )}
       </div>
