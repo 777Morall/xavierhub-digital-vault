@@ -22,43 +22,43 @@ const categories: Category[] = [
     icon: Tv,
     name: "STREAMINGS",
     slug: "streaming",
-    gradient: "from-red-500 to-rose-600",
+    gradient: "from-[#a030ad] to-[#7c2082]",
   },
   {
     icon: Package,
     name: "COMBOS",
     slug: "combo",
-    gradient: "from-blue-500 to-indigo-600",
+    gradient: "from-[#a030ad] to-[#7c2082]",
   },
   {
     icon: Crown,
     name: "ASSINATURAS",
     slug: "assinatura",
-    gradient: "from-amber-500 to-orange-600",
+    gradient: "from-[#a030ad] to-[#7c2082]",
   },
   {
     icon: Gamepad2,
     name: "JOGOS",
     slug: "jogos",
-    gradient: "from-green-500 to-emerald-600",
+    gradient: "from-[#a030ad] to-[#7c2082]",
   },
   {
     icon: MonitorSmartphone,
     name: "PAINEIS",
     slug: "painel",
-    gradient: "from-purple-500 to-violet-600",
+    gradient: "from-[#a030ad] to-[#7c2082]",
   },
   {
     icon: Key,
     name: "MÉTODOS",
     slug: "metodos",
-    gradient: "from-cyan-500 to-teal-600",
+    gradient: "from-[#a030ad] to-[#7c2082]",
   },
   {
     icon: Briefcase,
     name: "TRABALHO",
     slug: "trabalho",
-    gradient: "from-pink-500 to-rose-600",
+    gradient: "from-[#a030ad] to-[#7c2082]",
   },
 ];
 
@@ -83,21 +83,21 @@ const CategoriesSection = () => {
                 const element = document.getElementById('produtos');
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="group flex-shrink-0 w-32 md:w-auto"
+              className="group flex-shrink-0 w-20 md:w-auto"
             >
               <div className={`
-                relative aspect-square rounded-2xl overflow-hidden
+                relative aspect-square rounded-xl overflow-hidden
                 bg-gradient-to-br ${category.gradient}
-                p-4 flex flex-col items-center justify-center
+                p-2 flex flex-col items-center justify-center
                 transition-all duration-300
                 group-hover:scale-105 group-hover:shadow-lg
                 border border-primary/20
               `}>
                 {/* Icon */}
-                <category.icon className="h-5 w-5 md:h-6 md:w-6 text-white mb-2 drop-shadow-lg" />
+                <category.icon className="h-4 w-4 text-white mb-1 drop-shadow-lg" />
                 
                 {/* Name */}
-                <span className="font-display text-xs md:text-sm font-bold text-white text-center leading-tight drop-shadow">
+                <span className="font-display text-[10px] md:text-xs font-bold text-white text-center leading-tight drop-shadow">
                   {category.name}
                 </span>
 
