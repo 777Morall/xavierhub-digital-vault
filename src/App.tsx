@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import ProductDetail from "./pages/ProductDetail";
 import Checkout from "./pages/Checkout";
+import Payment from "./pages/Payment";
 import Success from "./pages/Success";
 import MyPurchases from "./pages/MyPurchases";
 import Login from "./pages/Login";
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/produto/:idOrSlug" element={<ProductDetail />} />
           <Route path="/checkout/:productId" element={<Checkout />} />
+          <Route path="/pagar/:transactionId" element={<Payment />} />
           <Route path="/sucesso" element={<Success />} />
           <Route path="/meus-produtos" element={<MyPurchases />} />
           <Route path="/login" element={<Login />} />

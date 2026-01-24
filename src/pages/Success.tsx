@@ -27,6 +27,8 @@ const SuccessPage = () => {
         license_key: "",
         payment_status: "paid",
         status: "active",
+        qr_code: null,
+        qr_code_base64: null,
         product: { id: 0, name: "Produto Digital", type: "software" },
         price_paid: 0,
         payment_method: "pix",

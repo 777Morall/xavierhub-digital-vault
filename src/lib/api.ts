@@ -46,6 +46,10 @@ export interface PaymentStatus {
   license_key: string;
   payment_status: 'pending' | 'paid' | 'cancelled' | 'expired' | 'refunded';
   status: string;
+  qr_code: string | null;
+  qr_code_base64: string | null;
+  qr_code_expires_at?: string;
+  qr_code_expired?: boolean;
   product: {
     id: number;
     name: string;
@@ -60,6 +64,7 @@ export interface PaymentStatus {
   access_expires_at: string | null;
   created_at: string;
   updated_at: string;
+  last_api_check?: string;
 }
 
 export interface Purchase {
@@ -125,12 +130,27 @@ export async function getProduct(idOrSlug: string | number): Promise<Product | n
   return data.data.id ? data.data : null;
 }
 
+// Gerar UUID v4
+export function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 // Criar pagamento PIX
-export async function createPayment(productId: number, email: string): Promise<PaymentData> {
+export async function createPayment(productId: number, email: string, transactionId?: string): Promise<PaymentData> {
+  const txId = transactionId || generateUUID();
+  
   const res = await fetch(`${API_URL}/api/create-payment.php`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ product_id: productId, user_email: email })
+    body: JSON.stringify({ 
+      product_id: productId, 
+      user_email: email,
+      transaction_id: txId
+    })
   });
   
   const data: ApiResponse<PaymentData> = await res.json();
