@@ -101,8 +101,8 @@ const ProductCard = ({ product, discount }: ProductCardProps) => {
             onClick={() => navigate(`/checkout/${product.id}`)}
             className="shrink-0"
           >
-            <ShoppingCart className="h-4 w-4 mr-1" />
-            Comprar
+            <ShoppingCart className="h-4 w-4" />
+            <span className="hidden sm:inline ml-1">Comprar</span>
           </Button>
         </div>
       </div>
