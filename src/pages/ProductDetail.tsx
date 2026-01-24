@@ -80,7 +80,7 @@ const ProductDetail = () => {
     );
   }
 
-  const imageUrl = product.image || getDefaultImage(product.type);
+  const imageUrl = product.image_url || product.image || getDefaultImage(product.type);
   const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
 
   return (

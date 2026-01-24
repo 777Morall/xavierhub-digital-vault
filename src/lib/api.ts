@@ -5,8 +5,11 @@ export interface Product {
   merchant_id: number;
   name: string;
   description: string;
+  file_path?: string;
+  image_url?: string;
   image?: string;
   price: number;
+  price_formatted?: string;
   status: string;
   type: string;
   delivery_type: string;
@@ -14,7 +17,10 @@ export interface Product {
   access_duration?: string;
   slug: string;
   demo_url?: string;
+  merchant_name?: string;
+  merchant_email?: string;
   created_at: string;
+  created_at_formatted?: string;
   updated_at?: string;
 }
 
@@ -102,10 +108,12 @@ export async function getProducts(params?: {
 export async function getProduct(idOrSlug: string | number): Promise<Product | null> {
   const param = typeof idOrSlug === 'number' ? `id=${idOrSlug}` : `slug=${idOrSlug}`;
   const res = await fetch(`${API_URL}/api/products.php?${param}`);
-  const data: ApiResponse<{ products: Product[] }> = await res.json();
+  const data = await res.json();
   
-  if (!data.success || !data.data.products.length) return null;
-  return data.data.products[0];
+  if (!data.success) return null;
+  
+  // API retorna produto direto em data (não em data.products) para busca por ID/slug
+  return data.data.id ? data.data : null;
 }
 
 // Criar pagamento PIX

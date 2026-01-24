@@ -27,7 +27,7 @@ const ProductCard = ({ product, discount }: ProductCardProps) => {
     return images[type] || images.outro;
   };
 
-  const imageUrl = product.image || getDefaultImage(product.type);
+  const imageUrl = product.image_url || product.image || getDefaultImage(product.type);
 
   return (
     <div className="group relative bg-card rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 card-glow">
