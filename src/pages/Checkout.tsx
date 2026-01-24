@@ -58,6 +58,10 @@ const Checkout = () => {
       setError(null);
       
       const paymentData = await createPayment(product.id, email);
+      console.log('Payment created:', paymentData);
+      console.log('QR Code Base64:', paymentData.qr_code_base64?.substring(0, 50));
+      console.log('QR Code:', paymentData.qr_code?.substring(0, 50));
+      
       setPayment(paymentData);
       setState('pending');
       
