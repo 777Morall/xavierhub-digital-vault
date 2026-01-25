@@ -255,7 +255,7 @@ const ProductDetail = () => {
 
               {/* Delivery Info */}
               <p className="text-xs text-muted-foreground mt-4 text-center">
-                ⚡ Entrega: <span className="text-foreground">{product.delivery_info || 'Download imediato após pagamento'}</span>
+                ⚡ Entrega: Via Email e no Minhas Compras</span>
               </p>
             </div>
           </div>
