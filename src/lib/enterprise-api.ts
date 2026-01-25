@@ -269,16 +269,28 @@ async function enterpriseFetch<T>(
     headers,
     credentials: 'include',
   });
-  
-  const data = await res.json();
-  
+
+  // Try to parse JSON even on error responses
+  let data: any = null;
+  try {
+    data = await res.json();
+  } catch {
+    data = null;
+  }
+
+  // Only force logout on 401. Other errors (403/CORS issues/5xx) should not wipe session.
   if (res.status === 401) {
     removeAdminToken();
     window.location.href = '/enterprise/owner/login';
     throw new Error('Session expired');
   }
-  
-  return data;
+
+  if (!res.ok) {
+    const msg = (data && (data.error || data.message)) || `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+
+  return data as T;
 }
 
 // Auth endpoints

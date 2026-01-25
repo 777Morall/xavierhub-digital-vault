@@ -48,8 +48,12 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
           removeAdminToken();
         }
       } else {
-        removeAdminToken();
-        setMerchant(null);
+        // If verify returns a non-success payload but we have local session data,
+        // don't immediately destroy the session (can happen with transient issues).
+        if (!storedMerchant) {
+          removeAdminToken();
+          setMerchant(null);
+        }
       }
     } catch (error) {
       // If verification fails but we have stored data, keep the session
