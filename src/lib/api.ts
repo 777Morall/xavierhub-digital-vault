@@ -12,16 +12,62 @@ export interface Product {
   price_formatted?: string;
   status: string;
   type: string;
-  delivery_type: string;
+  delivery_type?: string;
   delivery_info?: string;
   access_duration?: string;
-  slug: string;
+  slug?: string;
+  custom_slug?: string;
+  use_custom_slug?: boolean;
   demo_url?: string;
+  demo_url_formatted?: string;
+  custom_callback_url?: string | null;
+  use_custom_callback?: boolean;
   merchant_name?: string;
   merchant_email?: string;
   created_at: string;
   created_at_formatted?: string;
   updated_at?: string;
+  updated_at_formatted?: string;
+}
+
+// Parâmetros de busca de produtos
+export interface ProductSearchParams {
+  id?: number;
+  slug?: string;
+  merchant_id?: number;
+  search?: string;
+  name?: string;
+  type?: string;
+  status?: string;
+  min_price?: number;
+  max_price?: number;
+  limit?: number;
+  offset?: number;
+  order_by?: 'id' | 'name' | 'price' | 'created_at' | 'updated_at';
+  order_dir?: 'ASC' | 'DESC';
+}
+
+// Resposta de paginação
+export interface ProductPagination {
+  count: number;
+  total: number;
+  limit: number;
+  offset: number;
+  current_page: number;
+  total_pages: number;
+  has_next: boolean;
+  has_previous: boolean;
+}
+
+// Resposta completa de listagem de produtos
+export interface ProductListResponse {
+  products: Product[];
+  pagination: ProductPagination;
+  filters: Record<string, unknown>;
+  order: {
+    by: string;
+    direction: string;
+  };
 }
 
 export interface PaymentData {
@@ -113,30 +159,34 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
   errors?: Record<string, string>;
-  timestamp: string;
+  timestamp?: string;
 }
 
-// Buscar produtos
-export async function getProducts(params?: {
-  id?: number;
-  slug?: string;
-  merchant_id?: number;
-  type?: string;
-  limit?: number;
-  offset?: number;
-}): Promise<{ products: Product[]; count: number }> {
+// Buscar produtos com filtros avançados
+export async function getProducts(params?: ProductSearchParams): Promise<ProductListResponse> {
   const query = params ? new URLSearchParams(
     Object.entries(params).reduce((acc, [key, value]) => {
-      if (value !== undefined) acc[key] = String(value);
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = String(value);
+      }
       return acc;
     }, {} as Record<string, string>)
   ).toString() : '';
   
   const res = await fetch(`${API_URL}/api/products.php${query ? `?${query}` : ''}`);
-  const data: ApiResponse<{ products: Product[]; count: number }> = await res.json();
+  const data: ApiResponse<ProductListResponse> = await res.json();
   
   if (!data.success) throw new Error(data.message);
   return data.data;
+}
+
+// Alias simples para compatibilidade
+export async function getProductsList(params?: ProductSearchParams): Promise<{ products: Product[]; count: number }> {
+  const response = await getProducts(params);
+  return {
+    products: response.products,
+    count: response.pagination.total
+  };
 }
 
 // Buscar produto por ID ou slug
