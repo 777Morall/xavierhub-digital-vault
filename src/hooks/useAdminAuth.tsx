@@ -81,7 +81,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     <AdminAuthContext.Provider
       value={{
         merchant,
-        isAuthenticated: !!merchant,
+        // Consider token as authenticated to prevent redirect loops when verify fails
+        // due to temporary network/CORS issues right after login.
+        isAuthenticated: !!merchant || !!getAdminToken(),
         isLoading,
         logout,
         refreshAuth,
@@ -106,7 +108,9 @@ export function RequireAdminAuth({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    // Only redirect if there's truly no token/session.
+    // This avoids the user getting stuck on login when verify fails but token exists.
+    if (!isLoading && !isAuthenticated && !getAdminToken()) {
       navigate('/enterprise/owner/login');
     }
   }, [isAuthenticated, isLoading, navigate]);
