@@ -116,15 +116,15 @@ function ProductsContent() {
     try {
       const result = await deleteProduct(deleteId);
       if (result.success) {
-        toast({ title: 'Sucesso', description: 'Produto deletado' });
+        toast({ title: 'Sucesso', description: result.message || 'Produto deletado' });
         fetchProducts();
         fetchStats();
       } else if (result.error) {
         toast({
           title: 'Erro',
-          description: result.error.sales_count
-            ? `Não é possível deletar produto com ${result.error.sales_count} vendas. Inative-o.`
-            : result.error.message,
+          description: result.sales_count
+            ? `Não é possível deletar produto com ${result.sales_count} vendas. Inative-o.`
+            : result.error,
           variant: 'destructive',
         });
       }
