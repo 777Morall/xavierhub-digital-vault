@@ -12,6 +12,7 @@ import {
   ProductData,
   formatCurrency,
   getStatusColor,
+  extractPaginatedData,
 } from '@/lib/enterprise-api';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -30,7 +31,7 @@ function ProductsContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState({ total: 0, pages: 1 });
+  const [pagination, setPagination] = useState({ total: 0, total_pages: 1 });
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -38,10 +39,10 @@ function ProductsContent() {
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const result = await getProducts({ page, limit: 20, search: search || undefined });
+      const result = await getProducts({ page, per_page: 20, search: search || undefined });
       if (result.success) {
-        setProducts(result.data);
-        setPagination(result.pagination);
+        setProducts(extractPaginatedData(result));
+        setPagination({ total: result.pagination.total, total_pages: result.pagination.total_pages });
       }
     } catch (error) {
       console.error('Error fetching products:', error);
@@ -208,7 +209,7 @@ function ProductsContent() {
         isLoading={isLoading}
         pagination={{
           page,
-          pages: pagination.pages,
+          pages: pagination.total_pages,
           total: pagination.total,
           onPageChange: setPage,
         }}

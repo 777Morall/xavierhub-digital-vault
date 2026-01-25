@@ -19,6 +19,7 @@ import {
   formatCurrency,
   formatDate,
   getStatusColor,
+  extractPaginatedData,
 } from '@/lib/enterprise-api';
 
 function TransactionsContent() {
@@ -27,7 +28,7 @@ function TransactionsContent() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState({ total: 0, pages: 1 });
+  const [pagination, setPagination] = useState({ total: 0, total_pages: 1 });
   const navigate = useNavigate();
 
   const fetchTransactions = async () => {
@@ -35,13 +36,13 @@ function TransactionsContent() {
     try {
       const result = await getTransactions({
         page,
-        limit: 20,
+        per_page: 20,
         search: search || undefined,
         status: statusFilter !== 'all' ? statusFilter : undefined,
       });
       if (result.success) {
-        setTransactions(result.data);
-        setPagination(result.pagination);
+        setTransactions(extractPaginatedData(result));
+        setPagination({ total: result.pagination.total, total_pages: result.pagination.total_pages });
       }
     } catch (error) {
       console.error('Error fetching transactions:', error);
@@ -183,7 +184,7 @@ function TransactionsContent() {
         isLoading={isLoading}
         pagination={{
           page,
-          pages: pagination.pages,
+          pages: pagination.total_pages,
           total: pagination.total,
           onPageChange: setPage,
         }}

@@ -13,6 +13,7 @@ import {
   formatCurrency,
   formatDate,
   getStatusColor,
+  extractPaginatedData,
 } from '@/lib/enterprise-api';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -31,7 +32,7 @@ function UsersContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState({ total: 0, pages: 1 });
+  const [pagination, setPagination] = useState({ total: 0, total_pages: 1 });
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -39,10 +40,10 @@ function UsersContent() {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const result = await getUsers({ page, limit: 20, search: search || undefined });
+      const result = await getUsers({ page, per_page: 20, search: search || undefined });
       if (result.success) {
-        setUsers(result.data);
-        setPagination(result.pagination);
+        setUsers(extractPaginatedData(result));
+        setPagination({ total: result.pagination.total, total_pages: result.pagination.total_pages });
       }
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -191,7 +192,7 @@ function UsersContent() {
         isLoading={isLoading}
         pagination={{
           page,
-          pages: pagination.pages,
+          pages: pagination.total_pages,
           total: pagination.total,
           onPageChange: setPage,
         }}
