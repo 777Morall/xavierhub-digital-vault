@@ -1,18 +1,26 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plus, Eye, Edit, Trash2, Package } from 'lucide-react';
+import { Search, Plus, Eye, Edit, Trash2, Package, Power, Filter, TrendingUp, ShoppingCart, DollarSign } from 'lucide-react';
 import { AdminLayout } from '@/components/enterprise/AdminLayout';
 import { DataTable, Column } from '@/components/enterprise/DataTable';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   getProducts,
   deleteProduct,
+  toggleProductStatus,
+  getProductStats,
   ProductData,
   formatCurrency,
   getStatusColor,
-  extractPaginatedData,
 } from '@/lib/enterprise-api';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -25,35 +33,74 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { StatsCard } from '@/components/enterprise/StatsCard';
 
 function ProductsContent() {
   const [products, setProducts] = useState<ProductData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [pagination, setPagination] = useState({ total: 0, total_pages: 1 });
+  const [pagination, setPagination] = useState({ total: 0, pages: 1 });
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [typeFilter, setTypeFilter] = useState<string>('');
+  const [sortBy, setSortBy] = useState<string>('created_at');
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
+  const [stats, setStats] = useState<{ total: number; ativos: number; inativos: number; vendas: number; receita: number } | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const fetchProducts = async () => {
     setIsLoading(true);
     try {
-      const result = await getProducts({ page, per_page: 20, search: search || undefined });
-      if (result.success) {
-        setProducts(extractPaginatedData(result));
-        setPagination({ total: result.pagination.total, total_pages: result.pagination.total_pages });
+      const result = await getProducts({
+        page,
+        limit: 20,
+        search: search || undefined,
+        status: statusFilter || undefined,
+        type: typeFilter || undefined,
+        sort: sortBy,
+        order: sortOrder,
+      });
+      if (result.success && result.data) {
+        setProducts(result.data.products || []);
+        setPagination({
+          total: result.data.pagination.total,
+          pages: result.data.pagination.pages,
+        });
       }
     } catch (error) {
       console.error('Error fetching products:', error);
+      toast({ title: 'Erro', description: 'Falha ao carregar produtos', variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const fetchStats = async () => {
+    try {
+      const result = await getProductStats();
+      if (result.success && result.data) {
+        setStats({
+          total: result.data.produtos.total,
+          ativos: result.data.produtos.ativos,
+          inativos: result.data.produtos.inativos,
+          vendas: result.data.vendas.total,
+          receita: result.data.vendas.receita,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
-  }, [page]);
+  }, [page, statusFilter, typeFilter, sortBy, sortOrder]);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -70,11 +117,45 @@ function ProductsContent() {
       if (result.success) {
         toast({ title: 'Sucesso', description: 'Produto deletado' });
         fetchProducts();
+        fetchStats();
+      } else if (result.error) {
+        toast({
+          title: 'Erro',
+          description: result.error.sales_count
+            ? `Não é possível deletar produto com ${result.error.sales_count} vendas. Inative-o.`
+            : result.error.message,
+          variant: 'destructive',
+        });
       }
     } catch (error) {
       toast({ title: 'Erro', description: 'Falha ao deletar', variant: 'destructive' });
     }
     setDeleteId(null);
+  };
+
+  const handleToggleStatus = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const result = await toggleProductStatus(id);
+      if (result.success && result.data) {
+        toast({
+          title: 'Sucesso',
+          description: `Produto ${result.data.status === 'active' ? 'ativado' : 'inativado'}`,
+        });
+        fetchProducts();
+        fetchStats();
+      }
+    } catch (error) {
+      toast({ title: 'Erro', description: 'Falha ao alterar status', variant: 'destructive' });
+    }
+  };
+
+  const getProductRevenue = (item: ProductData): number => {
+    return item.stats?.total_revenue ?? item.receita_total ?? 0;
+  };
+
+  const getProductSales = (item: ProductData): number => {
+    return item.stats?.total_sales ?? item.total_vendas ?? 0;
   };
 
   const columns: Column<ProductData>[] = [
@@ -83,16 +164,16 @@ function ProductsContent() {
       header: 'Produto',
       render: (item) => (
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center overflow-hidden">
             {item.image_url ? (
-              <img src={item.image_url} alt={item.name} className="w-full h-full object-cover rounded-lg" />
+              <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
             ) : (
               <Package className="h-6 w-6 text-primary" />
             )}
           </div>
           <div className="min-w-0">
             <p className="font-medium text-foreground truncate max-w-[200px]">{item.name}</p>
-            <p className="text-sm text-muted-foreground">{item.type}</p>
+            <p className="text-sm text-muted-foreground capitalize">{item.type}</p>
           </div>
         </div>
       ),
@@ -107,19 +188,26 @@ function ProductsContent() {
     {
       key: 'total_vendas',
       header: 'Vendas',
-      render: (item) => <span className="font-medium">{item.total_vendas}</span>,
+      render: (item) => (
+        <div className="flex items-center gap-1">
+          <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+          <span className="font-medium">{getProductSales(item)}</span>
+        </div>
+      ),
     },
     {
       key: 'receita_total',
       header: 'Receita',
-      render: (item) => formatCurrency(item.receita_total),
+      render: (item) => (
+        <span className="text-green-400">{formatCurrency(getProductRevenue(item))}</span>
+      ),
     },
     {
       key: 'delivery_type',
       header: 'Entrega',
       render: (item) => (
-        <Badge variant="outline" className="bg-secondary/50">
-          {item.delivery_type}
+        <Badge variant="outline" className="bg-secondary/50 capitalize">
+          {item.delivery_type?.replace('_', ' ')}
         </Badge>
       ),
     },
@@ -128,7 +216,7 @@ function ProductsContent() {
       header: 'Status',
       render: (item) => (
         <Badge variant="outline" className={getStatusColor(item.status)}>
-          {item.status}
+          {item.status === 'active' ? 'Ativo' : item.status === 'inactive' ? 'Inativo' : item.status}
         </Badge>
       ),
     },
@@ -136,7 +224,7 @@ function ProductsContent() {
       key: 'actions',
       header: '',
       render: (item) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
@@ -144,6 +232,7 @@ function ProductsContent() {
               e.stopPropagation();
               navigate(`/enterprise/owner/products/${item.id}`);
             }}
+            title="Ver detalhes"
           >
             <Eye className="h-4 w-4" />
           </Button>
@@ -154,8 +243,18 @@ function ProductsContent() {
               e.stopPropagation();
               navigate(`/enterprise/owner/products/${item.id}/edit`);
             }}
+            title="Editar"
           >
             <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={(e) => handleToggleStatus(item.id, e)}
+            title={item.status === 'active' ? 'Inativar' : 'Ativar'}
+            className={item.status === 'active' ? 'text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10' : 'text-green-400 hover:text-green-300 hover:bg-green-500/10'}
+          >
+            <Power className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
@@ -165,12 +264,13 @@ function ProductsContent() {
               e.stopPropagation();
               setDeleteId(item.id);
             }}
+            title="Deletar"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       ),
-      className: 'w-32',
+      className: 'w-40',
     },
   ];
 
@@ -191,15 +291,96 @@ function ProductsContent() {
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar por nome ou descrição..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-10 bg-secondary/50"
-        />
+      {/* Stats Cards */}
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatsCard
+            title="Total de Produtos"
+            value={stats.total}
+            icon={<Package className="h-6 w-6" />}
+          />
+          <StatsCard
+            title="Produtos Ativos"
+            value={stats.ativos}
+            icon={<TrendingUp className="h-6 w-6" />}
+          />
+          <StatsCard
+            title="Total de Vendas"
+            value={stats.vendas}
+            icon={<ShoppingCart className="h-6 w-6" />}
+          />
+          <StatsCard
+            title="Receita Total"
+            value={formatCurrency(stats.receita)}
+            icon={<DollarSign className="h-6 w-6" />}
+          />
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome ou descrição..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10 bg-secondary/50"
+          />
+        </div>
+        
+        <div className="flex gap-2 flex-wrap">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[130px] bg-secondary/50">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Todos</SelectItem>
+              <SelectItem value="active">Ativo</SelectItem>
+              <SelectItem value="inactive">Inativo</SelectItem>
+              <SelectItem value="cancelled">Cancelado</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="w-[140px] bg-secondary/50">
+              <SelectValue placeholder="Tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Todos</SelectItem>
+              <SelectItem value="ebook">E-book</SelectItem>
+              <SelectItem value="curso">Curso</SelectItem>
+              <SelectItem value="software">Software</SelectItem>
+              <SelectItem value="assinatura">Assinatura</SelectItem>
+              <SelectItem value="outro">Outro</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[140px] bg-secondary/50">
+              <SelectValue placeholder="Ordenar" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="created_at">Data criação</SelectItem>
+              <SelectItem value="updated_at">Última atualização</SelectItem>
+              <SelectItem value="name">Nome</SelectItem>
+              <SelectItem value="price">Preço</SelectItem>
+              <SelectItem value="sales">Vendas</SelectItem>
+              <SelectItem value="revenue">Receita</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC')}
+            className="bg-secondary/50"
+            title={sortOrder === 'ASC' ? 'Crescente' : 'Decrescente'}
+          >
+            {sortOrder === 'ASC' ? '↑' : '↓'}
+          </Button>
+        </div>
       </div>
 
       {/* Table */}
@@ -209,11 +390,12 @@ function ProductsContent() {
         isLoading={isLoading}
         pagination={{
           page,
-          pages: pagination.total_pages,
+          pages: pagination.pages,
           total: pagination.total,
           onPageChange: setPage,
         }}
         onRowClick={(product) => navigate(`/enterprise/owner/products/${product.id}`)}
+        emptyMessage="Nenhum produto encontrado"
       />
 
       {/* Delete Dialog */}
@@ -223,6 +405,7 @@ function ProductsContent() {
             <AlertDialogTitle>Deletar Produto</AlertDialogTitle>
             <AlertDialogDescription>
               Tem certeza que deseja deletar este produto? Esta ação não pode ser desfeita.
+              Produtos com vendas associadas não podem ser deletados.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
