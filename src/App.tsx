@@ -14,6 +14,14 @@ import Register from "./pages/Register";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
+// Enterprise Admin Pages
+import AdminLogin from "./pages/enterprise/AdminLogin";
+import AdminDashboard from "./pages/enterprise/AdminDashboard";
+import AdminUsers from "./pages/enterprise/AdminUsers";
+import AdminProducts from "./pages/enterprise/AdminProducts";
+import AdminCompras from "./pages/enterprise/AdminCompras";
+import AdminTransactions from "./pages/enterprise/AdminTransactions";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -32,6 +40,21 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/registrar" element={<Register />} />
           <Route path="/perfil" element={<Profile />} />
+          
+          {/* Enterprise Admin Routes */}
+          <Route path="/enterprise/owner/login" element={<AdminLogin />} />
+          <Route path="/enterprise/owner" element={<AdminDashboard />} />
+          <Route path="/enterprise/owner/users" element={<AdminUsers />} />
+          <Route path="/enterprise/owner/users/:id" element={<AdminUsers />} />
+          <Route path="/enterprise/owner/products" element={<AdminProducts />} />
+          <Route path="/enterprise/owner/products/new" element={<AdminProducts />} />
+          <Route path="/enterprise/owner/products/:id" element={<AdminProducts />} />
+          <Route path="/enterprise/owner/products/:id/edit" element={<AdminProducts />} />
+          <Route path="/enterprise/owner/compras" element={<AdminCompras />} />
+          <Route path="/enterprise/owner/compras/:id" element={<AdminCompras />} />
+          <Route path="/enterprise/owner/transactions" element={<AdminTransactions />} />
+          <Route path="/enterprise/owner/transactions/:id" element={<AdminTransactions />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
