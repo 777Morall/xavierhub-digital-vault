@@ -155,8 +155,17 @@ export interface UserData {
   total_gasto?: number;
 }
 
+export interface ProductStats {
+  total_sales: number;
+  paid_sales: number;
+  pending_sales: number;
+  total_revenue: number;
+  last_sale?: string;
+}
+
 export interface ProductData {
   id: number;
+  merchant_id?: number;
   name: string;
   description: string;
   price: number;
@@ -165,11 +174,63 @@ export interface ProductData {
   delivery_type: string;
   delivery_info?: string;
   access_duration?: string;
+  image_url?: string;
+  has_delivery_file?: boolean;
   slug?: string;
+  use_custom_slug?: boolean;
+  demo_url?: string;
+  product_callback_url?: string;
+  use_custom_callback?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  stats?: ProductStats;
+  // Legacy fields for compatibility
   total_vendas?: number;
   receita_total?: number;
-  image_url?: string;
-  created_at?: string;
+}
+
+export interface ProductDetailResponse {
+  success: boolean;
+  data: {
+    product: ProductData;
+    recentSales?: Array<{
+      id: number;
+      payment_status: string;
+      price_paid: number;
+      created_at: string;
+      username: string;
+      email: string;
+    }>;
+  };
+}
+
+export interface ProductStatsResponse {
+  success: boolean;
+  data: {
+    produtos: {
+      total: number;
+      ativos: number;
+      inativos: number;
+    };
+    vendas: {
+      total: number;
+      receita: number;
+    };
+  };
+}
+
+export interface ProductListResponse {
+  success: boolean;
+  data: {
+    products: ProductData[];
+    pagination: {
+      total: number;
+      page: number;
+      limit: number;
+      pages: number;
+      hasMore: boolean;
+    };
+  };
 }
 
 export interface CompraData {
@@ -388,41 +449,92 @@ export async function deleteUser(id: number): Promise<{ success: boolean; messag
 // Products
 export async function getProducts(params?: {
   page?: number;
-  per_page?: number;
+  limit?: number;
   search?: string;
   status?: string;
-}): Promise<PaginatedResponse<ProductData>> {
+  type?: string;
+  sort?: string;
+  order?: 'ASC' | 'DESC';
+}): Promise<ProductListResponse> {
   const queryParams = new URLSearchParams({ action: 'list' });
   
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined) queryParams.set(key, String(value));
+      if (value !== undefined && value !== '') queryParams.set(key, String(value));
     });
   }
   
   return enterpriseFetch(`/products.php?${queryParams.toString()}`);
 }
 
-export async function getProductById(id: number): Promise<{ success: boolean; product: ProductData }> {
+export async function getProductById(id: number): Promise<ProductDetailResponse> {
   return enterpriseFetch(`/products.php?action=get&id=${id}`);
 }
 
-export async function createProduct(data: Partial<ProductData>): Promise<{ success: boolean; message: string; product_id: number }> {
-  return enterpriseFetch('/products.php?action=create', {
+export async function createProductWithFormData(formData: FormData): Promise<{ success: boolean; data?: { message: string; product: ProductData }; error?: { message: string; errors?: Record<string, string> } }> {
+  const res = await fetch(`${ENTERPRISE_API_URL}/products.php?action=create`, {
     method: 'POST',
-    body: JSON.stringify(data),
+    credentials: 'include',
+    body: formData,
   });
+  
+  if (res.status === 401) {
+    clearSession();
+    window.location.href = '/enterprise/owner/login';
+    throw new Error('Session expired');
+  }
+  
+  return res.json();
 }
 
-export async function updateProduct(id: number, data: Partial<ProductData>): Promise<{ success: boolean; message: string }> {
-  return enterpriseFetch('/products.php?action=update', {
-    method: 'PUT',
-    body: JSON.stringify({ id, ...data }),
+export async function updateProductWithFormData(id: number, formData: FormData): Promise<{ success: boolean; data?: { message: string; product: ProductData }; error?: { message: string } }> {
+  const res = await fetch(`${ENTERPRISE_API_URL}/products.php?action=update&id=${id}`, {
+    method: 'POST',
+    credentials: 'include',
+    body: formData,
   });
+  
+  if (res.status === 401) {
+    clearSession();
+    window.location.href = '/enterprise/owner/login';
+    throw new Error('Session expired');
+  }
+  
+  return res.json();
 }
 
-export async function deleteProduct(id: number): Promise<{ success: boolean; message: string }> {
-  return enterpriseFetch(`/products.php?action=delete&id=${id}`, { method: 'DELETE' });
+export async function deleteProduct(id: number): Promise<{ success: boolean; data?: { message: string }; error?: { message: string; sales_count?: number } }> {
+  const res = await fetch(`${ENTERPRISE_API_URL}/products.php?action=delete&id=${id}`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  
+  if (res.status === 401) {
+    clearSession();
+    window.location.href = '/enterprise/owner/login';
+    throw new Error('Session expired');
+  }
+  
+  return res.json();
+}
+
+export async function toggleProductStatus(id: number): Promise<{ success: boolean; data?: { status: string; message: string }; error?: { message: string } }> {
+  const res = await fetch(`${ENTERPRISE_API_URL}/products.php?action=toggle-status&id=${id}`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+  
+  if (res.status === 401) {
+    clearSession();
+    window.location.href = '/enterprise/owner/login';
+    throw new Error('Session expired');
+  }
+  
+  return res.json();
+}
+
+export async function getProductStats(): Promise<ProductStatsResponse> {
+  return enterpriseFetch('/products.php?action=stats');
 }
 
 // Compras
