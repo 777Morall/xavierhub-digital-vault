@@ -155,53 +155,52 @@ export interface UserData {
   total_gasto?: number;
 }
 
-export interface ProductStats {
-  total_sales: number;
-  paid_sales: number;
-  pending_sales: number;
-  total_revenue: number;
-  last_sale?: string;
-}
-
 export interface ProductData {
   id: number;
   merchant_id?: number;
   name: string;
-  description: string;
-  price: number;
+  description?: string;
+  file_name?: string | null;
+  file_path?: string | null;
+  delivery_file?: string | null;
+  price: string; // API returns string like "200.00"
   status: string;
   type: string;
   delivery_type: string;
   delivery_info?: string;
   access_duration?: string;
-  image_url?: string;
-  has_delivery_file?: boolean;
+  product_callback_url?: string | null;
+  use_custom_callback?: number;
   slug?: string;
-  use_custom_slug?: boolean;
-  demo_url?: string;
-  product_callback_url?: string;
-  use_custom_callback?: boolean;
+  use_custom_slug?: number;
+  demo_url?: string | null;
   created_at?: string;
   updated_at?: string;
-  stats?: ProductStats;
-  // Legacy fields for compatibility
-  total_vendas?: number;
-  receita_total?: number;
+  // Sales stats (flat, not nested)
+  total_vendas?: string;
+  vendas_pagas?: string;
+  vendas_pendentes?: string;
+  receita_total?: string;
+}
+
+export interface ProductRecentSale {
+  id: number;
+  product_id: number;
+  user_id: number;
+  payment_status: string;
+  price_paid: string;
+  created_at: string;
+  username: string;
+  email: string;
 }
 
 export interface ProductDetailResponse {
   success: boolean;
   data: {
     product: ProductData;
-    recentSales?: Array<{
-      id: number;
-      payment_status: string;
-      price_paid: number;
-      created_at: string;
-      username: string;
-      email: string;
-    }>;
+    recentSales?: ProductRecentSale[];
   };
+  error?: string;
 }
 
 export interface ProductStatsResponse {
@@ -518,7 +517,7 @@ export async function deleteProduct(id: number): Promise<{ success: boolean; dat
   return res.json();
 }
 
-export async function toggleProductStatus(id: number): Promise<{ success: boolean; data?: { status: string; message: string }; error?: { message: string } }> {
+export async function toggleProductStatus(id: number): Promise<{ success: boolean; status?: string; message?: string; error?: string }> {
   const res = await fetch(`${ENTERPRISE_API_URL}/products.php?action=toggle-status&id=${id}`, {
     method: 'POST',
     credentials: 'include',
@@ -582,8 +581,16 @@ export async function getTransactionById(id: number): Promise<{ success: boolean
 }
 
 // Format helpers
-export function formatCurrency(value: number): string {
-  return value.toLocaleString('pt-BR', {
+export function parseNumber(value: string | number | undefined | null): number {
+  if (value === undefined || value === null) return 0;
+  if (typeof value === 'number') return value;
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+export function formatCurrency(value: string | number | undefined | null): string {
+  const num = parseNumber(value);
+  return num.toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL',
   });
