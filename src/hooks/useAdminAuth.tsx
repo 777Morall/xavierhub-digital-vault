@@ -26,6 +26,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const refreshAuth = async () => {
     const token = getAdminToken();
+    const storedMerchant = getStoredMerchant();
     
     if (!token) {
       setMerchant(null);
@@ -33,18 +34,31 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // If we have a stored merchant, use it immediately while verifying in background
+    if (storedMerchant) {
+      setMerchant(storedMerchant);
+    }
+
     try {
       const result = await adminVerify();
       if (result.success) {
-        const storedMerchant = getStoredMerchant();
-        setMerchant(storedMerchant);
+        // Keep using stored merchant data
+        if (!storedMerchant) {
+          setMerchant(null);
+          removeAdminToken();
+        }
       } else {
         removeAdminToken();
         setMerchant(null);
       }
-    } catch {
-      removeAdminToken();
-      setMerchant(null);
+    } catch (error) {
+      // If verification fails but we have stored data, keep the session
+      // This handles temporary network issues
+      console.warn('Token verification failed:', error);
+      if (!storedMerchant) {
+        removeAdminToken();
+        setMerchant(null);
+      }
     } finally {
       setIsLoading(false);
     }
