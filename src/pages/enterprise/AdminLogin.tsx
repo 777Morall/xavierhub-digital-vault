@@ -38,8 +38,8 @@ export default function AdminLogin() {
           title: 'Sucesso',
           description: `Bem-vindo, ${result.merchant?.name || 'Admin'}!`,
         });
-        // Use window.location for full page reload to ensure auth state is fresh
-        window.location.href = '/enterprise/owner';
+        // Use full page reload to ensure auth state is fresh
+        window.location.href = '/enterprise/owner/dashboard';
       } else {
         toast({
           title: 'Erro',

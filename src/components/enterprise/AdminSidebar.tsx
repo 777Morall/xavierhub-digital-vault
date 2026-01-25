@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import logo from '@/assets/logo.png';
 
 const navItems = [
-  { title: 'Dashboard', icon: LayoutDashboard, path: '/enterprise/owner' },
+  { title: 'Dashboard', icon: LayoutDashboard, path: '/enterprise/owner/dashboard' },
   { title: 'Usuários', icon: Users, path: '/enterprise/owner/users' },
   { title: 'Produtos', icon: Package, path: '/enterprise/owner/products' },
   { title: 'Compras', icon: ShoppingCart, path: '/enterprise/owner/compras' },
@@ -31,8 +31,8 @@ export function AdminSidebar() {
   const location = useLocation();
 
   const isActive = (path: string) => {
-    if (path === '/enterprise/owner') {
-      return location.pathname === path;
+    if (path === '/enterprise/owner/dashboard') {
+      return location.pathname === path || location.pathname === '/enterprise/owner';
     }
     return location.pathname.startsWith(path);
   };
@@ -58,7 +58,7 @@ export function AdminSidebar() {
           <NavLink
             key={item.path}
             to={item.path}
-            end={item.path === '/enterprise/owner'}
+            end={item.path === '/enterprise/owner/dashboard'}
             onClick={() => setMobileOpen(false)}
             className={cn(
               'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200',
