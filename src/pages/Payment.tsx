@@ -234,163 +234,204 @@ const Payment = () => {
             {state === 'pending' && (
               <div className="space-y-6 animate-fade-in">
                 {/* Header Card */}
-                <div className="card-glass rounded-2xl p-6 text-center">
-                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-                    <Clock className="h-4 w-4" />
-                    {timeLeft !== null && timeLeft > 0 ? (
-                      <span>Expira em {formatTime(timeLeft)}</span>
-                    ) : (
-                      <span>Aguardando pagamento</span>
-                    )}
+                <div className="relative">
+                  <div className="absolute -inset-[1px] bg-gradient-to-br from-primary/50 via-primary/20 to-transparent rounded-2xl" />
+                  <div className="relative bg-card/95 backdrop-blur-sm rounded-2xl p-6 text-center border border-primary/10">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4 ring-1 ring-primary/20">
+                      <Clock className="h-4 w-4" />
+                      {timeLeft !== null && timeLeft > 0 ? (
+                        <span className="font-mono font-bold">{formatTime(timeLeft)}</span>
+                      ) : (
+                        <span>Aguardando pagamento</span>
+                      )}
+                    </div>
+                    <h1 className="font-display text-2xl md:text-3xl font-bold mb-2">
+                      Pague com PIX
+                    </h1>
+                    <p className="text-muted-foreground">
+                      Escaneie o QR Code ou copie o código
+                    </p>
                   </div>
-                  <h1 className="font-display text-2xl md:text-3xl font-bold mb-2">
-                    Pague com PIX
-                  </h1>
-                  <p className="text-muted-foreground">
-                    Escaneie o QR Code ou copie o código
-                  </p>
                 </div>
 
                 {/* Product Summary */}
-                <div className="card-glass rounded-xl p-4 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0">
-                    <ShoppingBag className="h-6 w-6 text-primary" />
+                <div className="relative">
+                  <div className="absolute -inset-[1px] bg-gradient-to-r from-primary/30 to-transparent rounded-xl" />
+                  <div className="relative bg-card/95 backdrop-blur-sm rounded-xl p-4 flex items-center gap-4 border border-primary/10">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/30 to-primary/10 flex items-center justify-center shrink-0 ring-1 ring-primary/20">
+                      <ShoppingBag className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-foreground truncate">{payment.product.name}</h3>
+                      <p className="text-sm text-muted-foreground capitalize">{payment.product.type}</p>
+                    </div>
+                    <span className="font-display font-bold text-lg text-gradient">
+                      {formatPrice(payment.price_paid)}
+                    </span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground truncate">{payment.product.name}</h3>
-                    <p className="text-sm text-muted-foreground capitalize">{payment.product.type}</p>
-                  </div>
-                  <span className="font-display font-bold text-lg text-primary">
-                    {formatPrice(payment.price_paid)}
-                  </span>
                 </div>
 
                 {/* QR Code */}
                 {payment.qr_code && payment.qr_code_base64 ? (
-                  <div className="card-glass rounded-2xl p-6 md:p-8">
-                    {/* QR Code Image */}
-                    <div className="flex justify-center mb-6">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
-                        <div className="relative bg-white p-4 rounded-2xl shadow-xl">
-                          <img 
-                            src={payment.qr_code_base64} 
-                            alt="QR Code PIX" 
-                            className="w-48 h-48 md:w-56 md:h-56"
-                          />
+                  <div className="relative">
+                    <div className="absolute -inset-[1px] bg-gradient-to-br from-primary/40 via-transparent to-primary/30 rounded-2xl" />
+                    <div className="relative bg-card/95 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-primary/10">
+                      {/* QR Code Image */}
+                      <div className="flex justify-center mb-6">
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150" />
+                          <div className="relative bg-white p-4 rounded-2xl shadow-2xl ring-4 ring-primary/20">
+                            <img 
+                              src={payment.qr_code_base64} 
+                              alt="QR Code PIX" 
+                              className="w-48 h-48 md:w-56 md:h-56"
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Instructions */}
-                    <div className="flex items-center justify-center gap-3 mb-6">
-                      <Smartphone className="h-5 w-5 text-primary" />
-                      <p className="text-sm text-muted-foreground">
-                        Abra o app do seu banco e escaneie o código
-                      </p>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="flex-1 h-px bg-border" />
-                      <span className="text-xs text-muted-foreground uppercase">ou copie o código</span>
-                      <div className="flex-1 h-px bg-border" />
-                    </div>
-
-                    {/* Copy Code */}
-                    <div className="space-y-3">
-                      <div className="relative">
-                        <div className="p-4 pr-24 bg-secondary/50 rounded-xl font-mono text-xs text-muted-foreground break-all max-h-20 overflow-y-auto">
-                          {payment.qr_code}
-                        </div>
-                        <Button 
-                          onClick={handleCopyCode}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 h-10"
-                          size="sm"
-                        >
-                          {copied ? (
-                            <>
-                              <Check className="h-4 w-4 mr-1" />
-                              Copiado
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-4 w-4 mr-1" />
-                              Copiar
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Status */}
-                    <div className="mt-6 p-4 rounded-xl bg-primary/5 border border-primary/20 flex items-center gap-3">
-                      <div className="relative">
-                        <div className="w-3 h-3 rounded-full bg-primary animate-ping absolute" />
-                        <div className="w-3 h-3 rounded-full bg-primary relative" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-foreground">Aguardando pagamento...</p>
-                        <p className="text-xs text-muted-foreground">
-                          Verificação automática #{checkCount}
+                      {/* Instructions */}
+                      <div className="flex items-center justify-center gap-3 mb-6 p-3 rounded-xl bg-secondary/50 ring-1 ring-border/30">
+                        <Smartphone className="h-5 w-5 text-primary" />
+                        <p className="text-sm text-foreground/80">
+                          Abra o app do seu banco e escaneie o código
                         </p>
                       </div>
-                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+
+                      {/* Divider */}
+                      <div className="flex items-center gap-4 mb-6">
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                        <span className="text-xs text-muted-foreground uppercase font-medium">ou copie o código</span>
+                        <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                      </div>
+
+                      {/* Copy Code */}
+                      <div className="space-y-3">
+                        <div className="relative">
+                          <div className="p-4 pr-28 bg-secondary/70 rounded-xl font-mono text-xs text-muted-foreground break-all max-h-20 overflow-y-auto ring-1 ring-border/30">
+                            {payment.qr_code}
+                          </div>
+                          <Button 
+                            onClick={handleCopyCode}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-10 shadow-lg"
+                            size="sm"
+                          >
+                            {copied ? (
+                              <>
+                                <Check className="h-4 w-4 mr-1.5" />
+                                Copiado!
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-4 w-4 mr-1.5" />
+                                Copiar
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Modern Status Indicator */}
+                      <div className="mt-6 relative">
+                        <div className="absolute -inset-[1px] bg-gradient-to-r from-primary/40 to-primary/20 rounded-xl animate-pulse" />
+                        <div className="relative p-4 rounded-xl bg-card border border-primary/20 flex items-center gap-4">
+                          {/* Animated Status Indicator */}
+                          <div className="relative flex items-center justify-center w-12 h-12">
+                            <div className="absolute w-12 h-12 rounded-full border-2 border-primary/30 animate-ping" />
+                            <div className="absolute w-10 h-10 rounded-full border-2 border-primary/50 animate-pulse" />
+                            <div className="relative w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center ring-2 ring-primary/30">
+                              <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+                            </div>
+                          </div>
+                          
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-foreground">Verificando pagamento...</p>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="flex gap-1">
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                Verificação #{checkCount}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col items-center">
+                            <RefreshCw className="h-5 w-5 text-primary animate-spin" />
+                            <span className="text-[10px] text-muted-foreground mt-1">Auto</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="card-glass rounded-2xl p-8 text-center">
-                    <div className="w-16 h-16 rounded-full bg-warning/20 flex items-center justify-center mx-auto mb-4">
-                      <QrCode className="h-8 w-8 text-warning" />
+                  <div className="relative">
+                    <div className="absolute -inset-[1px] bg-gradient-to-br from-yellow-500/30 to-transparent rounded-2xl" />
+                    <div className="relative bg-card/95 backdrop-blur-sm rounded-2xl p-8 text-center border border-yellow-500/20">
+                      <div className="w-16 h-16 rounded-xl bg-yellow-500/20 flex items-center justify-center mx-auto mb-4 ring-2 ring-yellow-500/30">
+                        <QrCode className="h-8 w-8 text-yellow-500" />
+                      </div>
+                      <h3 className="font-display text-xl font-bold mb-2">QR Code não disponível</h3>
+                      <p className="text-muted-foreground mb-6">
+                        Não foi possível carregar o QR Code. Tente novamente.
+                      </p>
+                      <Button onClick={loadPayment} variant="outline" className="w-full">
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Recarregar
+                      </Button>
                     </div>
-                    <h3 className="font-display text-xl font-bold mb-2">QR Code não disponível</h3>
-                    <p className="text-muted-foreground mb-6">
-                      Não foi possível carregar o QR Code. Tente novamente.
-                    </p>
-                    <Button onClick={loadPayment} variant="outline" className="w-full">
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Recarregar
-                    </Button>
                   </div>
                 )}
 
                 {/* Security Badge */}
-                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <div className="flex items-center justify-center gap-2 p-3 rounded-xl bg-secondary/30 ring-1 ring-border/30">
                   <Shield className="h-4 w-4 text-primary" />
-                  <span>Pagamento 100% seguro</span>
+                  <span className="text-sm text-foreground/80">Pagamento 100% seguro via PIX</span>
                 </div>
               </div>
             )}
 
             {/* Paid State */}
             {state === 'paid' && (
-              <div className="card-glass rounded-2xl p-8 text-center animate-scale-in">
-                <div className="relative mb-6">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-24 h-24 bg-primary/30 rounded-full animate-ping" />
+              <div className="relative animate-scale-in">
+                <div className="absolute -inset-[1px] bg-gradient-to-br from-green-500/50 via-primary/30 to-green-500/40 rounded-2xl" />
+                <div className="relative bg-card/95 backdrop-blur-sm rounded-2xl p-8 text-center border border-green-500/20">
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-28 h-28 bg-green-500/20 rounded-full animate-ping" />
+                    </div>
+                    <div className="relative w-20 h-20 rounded-xl bg-green-500/20 flex items-center justify-center mx-auto ring-4 ring-green-500/30">
+                      <CheckCircle2 className="h-10 w-10 text-green-500" />
+                    </div>
                   </div>
-                  <div className="relative w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="h-10 w-10 text-primary" />
+                  <h2 className="font-display text-2xl font-bold mb-2 text-green-400">Pagamento Confirmado!</h2>
+                  <p className="text-muted-foreground mb-6">Redirecionando para o download...</p>
+                  <div className="flex justify-center gap-1">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
-                <h2 className="font-display text-2xl font-bold mb-2">Pagamento Confirmado!</h2>
-                <p className="text-muted-foreground mb-6">Redirecionando para o download...</p>
-                <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" />
               </div>
             )}
 
             {/* Expired State */}
             {state === 'expired' && (
-              <div className="card-glass rounded-2xl p-8 text-center animate-scale-in">
-                <div className="w-16 h-16 rounded-full bg-destructive/20 flex items-center justify-center mx-auto mb-4">
-                  <Clock className="h-8 w-8 text-destructive" />
+              <div className="relative animate-scale-in">
+                <div className="absolute -inset-[1px] bg-gradient-to-br from-destructive/40 to-transparent rounded-2xl" />
+                <div className="relative bg-card/95 backdrop-blur-sm rounded-2xl p-8 text-center border border-destructive/20">
+                  <div className="w-16 h-16 rounded-xl bg-destructive/20 flex items-center justify-center mx-auto mb-4 ring-2 ring-destructive/30">
+                    <Clock className="h-8 w-8 text-destructive" />
+                  </div>
+                  <h2 className="font-display text-xl font-bold mb-2">Pagamento Expirado</h2>
+                  <p className="text-muted-foreground mb-6">{error}</p>
+                  <Button onClick={() => navigate("/")} className="w-full">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Voltar ao Catálogo
+                  </Button>
                 </div>
-                <h2 className="font-display text-xl font-bold mb-2">Pagamento Expirado</h2>
-                <p className="text-muted-foreground mb-6">{error}</p>
-                <Button onClick={() => navigate("/")} className="w-full">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Voltar ao Catálogo
-                </Button>
               </div>
             )}
           </div>
