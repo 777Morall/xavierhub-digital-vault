@@ -1,4 +1,6 @@
-import { Send, MessageCircle, Instagram, Youtube } from "lucide-react";
+import { Send, MessageCircle, Instagram, Youtube, Headphones } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 
 const Footer = () => {
@@ -17,6 +19,14 @@ const Footer = () => {
         <div className="flex flex-col items-center gap-6">
           {/* Logo Centered */}
           <img src={logo} alt="XavierHub" className="h-16 w-auto" />
+
+          {/* Support Button */}
+          <Link to="/suporte">
+            <Button variant="outline" className="gap-2">
+              <Headphones className="h-4 w-4" />
+              Suporte
+            </Button>
+          </Link>
 
           {/* Social Links */}
           <div className="flex items-center gap-3">
