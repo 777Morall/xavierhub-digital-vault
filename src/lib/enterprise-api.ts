@@ -1,5 +1,6 @@
 // Enterprise Admin API Client
-const ENTERPRISE_API_URL = 'https://api.xavierhub.com/enterprise';
+// Base URL from documentation: https://www.xavierhub.com/enterprise
+const ENTERPRISE_API_URL = 'https://www.xavierhub.com/enterprise';
 
 // Types
 export interface AdminUser {
