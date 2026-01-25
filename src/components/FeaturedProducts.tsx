@@ -17,7 +17,7 @@ const FeaturedProducts = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getProducts({ limit: 12 });
+      const data = await getProducts({ limit: 20 });
       setProducts(data.products);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao carregar produtos');
