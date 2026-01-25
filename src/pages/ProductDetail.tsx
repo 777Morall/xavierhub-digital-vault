@@ -255,7 +255,7 @@ const ProductDetail = () => {
 
               {/* Delivery Info */}
               <p className="text-xs text-muted-foreground mt-4 text-center">
-                ⚡ Entrega: Via Email e no Minhas Compras</span>
+                ⚡ Entrega: Via Email e no Minhas Compras
               </p>
             </div>
           </div>
