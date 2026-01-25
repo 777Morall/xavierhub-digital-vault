@@ -139,8 +139,7 @@ const Suporte = () => {
                     <div>
                       <h3 className="font-bold text-foreground mb-2">Formas de Pagamento</h3>
                       <p className="text-muted-foreground text-sm leading-relaxed">
-                        Aceitamos PIX, cartão de crédito e outros métodos via Mercado Pago. 
-                        Pagamentos via PIX são confirmados instantaneamente.
+                        Aceitamos PIX, Pagamentos via PIX são confirmados instantaneamente.
                       </p>
                     </div>
                   </div>
