@@ -33,12 +33,13 @@ export default function AdminLogin() {
     try {
       const result = await adminLogin(email, password);
       
-      if (result.success) {
+      if (result.success && result.token) {
         toast({
           title: 'Sucesso',
-          description: `Bem-vindo, ${result.merchant.name}!`,
+          description: `Bem-vindo, ${result.merchant?.name || 'Admin'}!`,
         });
-        navigate('/enterprise/owner');
+        // Use window.location for full page reload to ensure auth state is fresh
+        window.location.href = '/enterprise/owner';
       } else {
         toast({
           title: 'Erro',
