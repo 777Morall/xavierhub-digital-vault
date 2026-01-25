@@ -66,7 +66,7 @@ const CategoriesSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section id="categorias" className="py-8">
+    <section id="categorias" className="py-6 pb-2">
       <div className="container mx-auto px-4">
         {/* Section Title */}
         <h2 className="font-display text-xl md:text-2xl font-bold text-foreground mb-6">
