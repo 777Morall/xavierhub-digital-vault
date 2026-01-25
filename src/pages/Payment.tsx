@@ -227,7 +227,7 @@ const Payment = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="pt-20 pb-12">
+      <main className="pt-28 pb-12">
         <div className="container mx-auto px-4">
           <div className="max-w-lg mx-auto">
             {/* Pending Payment */}
