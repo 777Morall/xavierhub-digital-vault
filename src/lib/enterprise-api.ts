@@ -163,12 +163,12 @@ export interface ProductData {
   file_name?: string | null;
   file_path?: string | null;
   delivery_file?: string | null;
-  price: string; // API returns string like "200.00"
+  price: string; // API returns string like "497.00"
   status: string;
   type: string;
   delivery_type: string;
-  delivery_info?: string;
-  access_duration?: string;
+  delivery_info?: string | null;
+  access_duration?: number | string | null;
   product_callback_url?: string | null;
   use_custom_callback?: number;
   slug?: string;
@@ -176,10 +176,10 @@ export interface ProductData {
   demo_url?: string | null;
   created_at?: string;
   updated_at?: string;
-  // Sales stats (flat, not nested)
-  total_vendas?: string;
-  vendas_pagas?: string;
-  vendas_pendentes?: string;
+  // Sales stats (flat fields - can be number or string from API)
+  total_vendas?: number | string;
+  vendas_pagas?: number | string;
+  vendas_pendentes?: number | string;
   receita_total?: string;
 }
 
@@ -470,7 +470,16 @@ export async function getProductById(id: number): Promise<ProductDetailResponse>
   return enterpriseFetch(`/products.php?action=get&id=${id}`);
 }
 
-export async function createProductWithFormData(formData: FormData): Promise<{ success: boolean; data?: { message: string; product: ProductData }; error?: { message: string; errors?: Record<string, string> } }> {
+// Create product response: { success: true, message: "...", id: number } or { error: "...", errors?: {...} }
+export interface CreateProductResponse {
+  success?: boolean;
+  message?: string;
+  id?: number;
+  error?: string;
+  errors?: Record<string, string>;
+}
+
+export async function createProductWithFormData(formData: FormData): Promise<CreateProductResponse> {
   const res = await fetch(`${ENTERPRISE_API_URL}/products.php?action=create`, {
     method: 'POST',
     credentials: 'include',
@@ -486,7 +495,14 @@ export async function createProductWithFormData(formData: FormData): Promise<{ s
   return res.json();
 }
 
-export async function updateProductWithFormData(id: number, formData: FormData): Promise<{ success: boolean; data?: { message: string; product: ProductData }; error?: { message: string } }> {
+// Update product response: { success: true, message: "..." } or { error: "..." }
+export interface UpdateProductResponse {
+  success?: boolean;
+  message?: string;
+  error?: string;
+}
+
+export async function updateProductWithFormData(id: number, formData: FormData): Promise<UpdateProductResponse> {
   const res = await fetch(`${ENTERPRISE_API_URL}/products.php?action=update&id=${id}`, {
     method: 'POST',
     credentials: 'include',
@@ -502,7 +518,15 @@ export async function updateProductWithFormData(id: number, formData: FormData):
   return res.json();
 }
 
-export async function deleteProduct(id: number): Promise<{ success: boolean; data?: { message: string }; error?: { message: string; sales_count?: number } }> {
+// Delete product response: { success: true, message: "..." } or { error: "...", sales_count?: number }
+export interface DeleteProductResponse {
+  success?: boolean;
+  message?: string;
+  error?: string;
+  sales_count?: number;
+}
+
+export async function deleteProduct(id: number): Promise<DeleteProductResponse> {
   const res = await fetch(`${ENTERPRISE_API_URL}/products.php?action=delete&id=${id}`, {
     method: 'POST',
     credentials: 'include',
@@ -517,7 +541,15 @@ export async function deleteProduct(id: number): Promise<{ success: boolean; dat
   return res.json();
 }
 
-export async function toggleProductStatus(id: number): Promise<{ success: boolean; status?: string; message?: string; error?: string }> {
+// Toggle status response: { success: true, message: "...", status: "active"|"inactive" }
+export interface ToggleProductStatusResponse {
+  success?: boolean;
+  message?: string;
+  status?: 'active' | 'inactive';
+  error?: string;
+}
+
+export async function toggleProductStatus(id: number): Promise<ToggleProductStatusResponse> {
   const res = await fetch(`${ENTERPRISE_API_URL}/products.php?action=toggle-status&id=${id}`, {
     method: 'POST',
     credentials: 'include',
