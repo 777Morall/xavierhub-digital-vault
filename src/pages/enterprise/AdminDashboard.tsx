@@ -6,14 +6,18 @@ import {
   Package,
   TrendingUp,
   Clock,
+  Award,
+  CreditCard,
 } from 'lucide-react';
 import { AdminLayout } from '@/components/enterprise/AdminLayout';
 import { StatsCard } from '@/components/enterprise/StatsCard';
 import { DataTable, Column } from '@/components/enterprise/DataTable';
 import {
   getDashboardStats,
+  getTopUsuarios,
   DashboardResponse,
   UltimaTransacao,
+  TopUsuario,
   formatCurrency,
   formatDate,
   getStatusColor,
@@ -29,25 +33,39 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
+// Helper to parse numeric values that may come as strings
+function parseNumber(value: string | number): number {
+  if (typeof value === 'number') return value;
+  return parseFloat(value) || 0;
+}
+
 function DashboardContent() {
   const [data, setData] = useState<DashboardResponse | null>(null);
+  const [topUsuarios, setTopUsuarios] = useState<TopUsuario[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchData = async () => {
       try {
-        const result = await getDashboardStats();
-        if (result.success) {
-          setData(result);
+        const [statsResult, usuariosResult] = await Promise.all([
+          getDashboardStats(),
+          getTopUsuarios(5),
+        ]);
+        
+        if (statsResult.success) {
+          setData(statsResult);
+        }
+        if (usuariosResult.success) {
+          setTopUsuarios(usuariosResult.top_usuarios || []);
         }
       } catch (error) {
-        console.error('Error fetching dashboard stats:', error);
+        console.error('Error fetching dashboard data:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchStats();
+    fetchData();
   }, []);
 
   const transactionColumns: Column<UltimaTransacao>[] = [
@@ -75,7 +93,9 @@ function DashboardContent() {
       key: 'price_paid',
       header: 'Valor',
       render: (item) => (
-        <span className="font-medium text-green-400">{formatCurrency(item.price_paid)}</span>
+        <span className="font-medium text-green-400">
+          {formatCurrency(parseNumber(item.price_paid))}
+        </span>
       ),
     },
     {
@@ -207,7 +227,41 @@ function DashboardContent() {
                     <p className="text-sm text-muted-foreground">{product.vendas} vendas</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-green-400">{formatCurrency(product.receita)}</p>
+                    <p className="font-medium text-green-400">
+                      {formatCurrency(parseNumber(product.receita))}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="h-[200px] flex items-center justify-center text-muted-foreground">
+              Sem dados para exibir
+            </div>
+          )}
+        </div>
+
+        {/* Top Buyers */}
+        <div className="rounded-xl border border-border/50 bg-card p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Award className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold text-foreground">Top Compradores</h3>
+          </div>
+          {topUsuarios.length > 0 ? (
+            <div className="space-y-4">
+              {topUsuarios.map((user, index) => (
+                <div key={user.id} className="flex items-center gap-4">
+                  <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary font-bold">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-foreground truncate">{user.username}</p>
+                    <p className="text-sm text-muted-foreground">{user.total_compras} compras</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-green-400">
+                      {formatCurrency(parseNumber(user.total_gasto))}
+                    </p>
                   </div>
                 </div>
               ))}
