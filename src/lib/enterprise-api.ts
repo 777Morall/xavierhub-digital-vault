@@ -1,12 +1,12 @@
-// Enterprise Admin API Client
+// Enterprise Admin API Client - Session-based Authentication
 const ENTERPRISE_API_URL = 'https://api.xavierhub.com/enterprise';
 
 // Types
 export interface AdminUser {
   merchant_id: number;
   email: string;
+  name?: string;
   is_admin: number;
-  exp?: number;
 }
 
 export interface Merchant {
@@ -18,8 +18,7 @@ export interface Merchant {
 
 export interface LoginResponse {
   success: boolean;
-  token: string;
-  merchant: Merchant;
+  user?: Merchant;
   error?: string;
 }
 
@@ -223,51 +222,40 @@ export interface PaginatedResponse<T> {
   pagination: PaginationData;
 }
 
-// Token management
-export function getAdminToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('admin_token');
-}
-
-export function setAdminToken(token: string): void {
-  localStorage.setItem('admin_token', token);
-}
-
-export function removeAdminToken(): void {
-  localStorage.removeItem('admin_token');
-  localStorage.removeItem('admin_merchant');
-}
+// Session state management (in-memory, not localStorage)
+let cachedUser: Merchant | null = null;
 
 export function getStoredMerchant(): Merchant | null {
-  if (typeof window === 'undefined') return null;
-  const merchant = localStorage.getItem('admin_merchant');
-  return merchant ? JSON.parse(merchant) : null;
+  return cachedUser;
 }
 
-export function setStoredMerchant(merchant: Merchant): void {
-  localStorage.setItem('admin_merchant', JSON.stringify(merchant));
+export function setStoredMerchant(merchant: Merchant | null): void {
+  cachedUser = merchant;
 }
 
-// Authenticated fetch helper
+export function clearSession(): void {
+  cachedUser = null;
+}
+
+// Check if we have a cached user (session might still be valid on server)
+export function hasSession(): boolean {
+  return cachedUser !== null;
+}
+
+// Authenticated fetch helper - uses cookies, no Authorization header needed
 async function enterpriseFetch<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const token = getAdminToken();
-  
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...options.headers,
   };
   
-  if (token) {
-    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-  }
-  
   const res = await fetch(`${ENTERPRISE_API_URL}${endpoint}`, {
     ...options,
     headers,
-    credentials: 'include',
+    credentials: 'include', // CRITICAL: Send session cookie
   });
 
   // Try to parse JSON even on error responses
@@ -278,9 +266,9 @@ async function enterpriseFetch<T>(
     data = null;
   }
 
-  // Only force logout on 401. Other errors (403/CORS issues/5xx) should not wipe session.
+  // Only force logout on 401. Other errors should not wipe session.
   if (res.status === 401) {
-    removeAdminToken();
+    clearSession();
     window.location.href = '/enterprise/owner/login';
     throw new Error('Session expired');
   }
@@ -298,29 +286,42 @@ export async function adminLogin(email: string, password: string): Promise<Login
   const res = await fetch(`${ENTERPRISE_API_URL}/auth.php?action=login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
+    credentials: 'include', // CRITICAL: Receive and store session cookie
     body: JSON.stringify({ email, password }),
   });
   
   const data = await res.json();
   
-  if (data.success && data.token) {
-    setAdminToken(data.token);
-    setStoredMerchant(data.merchant);
+  if (data.success && data.user) {
+    // Store user info in memory (session is managed via cookie)
+    setStoredMerchant(data.user);
   }
   
   return data;
 }
 
-export async function adminVerify(): Promise<{ success: boolean; user: AdminUser; error?: string }> {
-  return enterpriseFetch('/auth.php?action=verify');
+export async function adminVerify(): Promise<{ authenticated: boolean; user?: AdminUser; error?: string }> {
+  try {
+    const data = await enterpriseFetch<{ authenticated: boolean; user?: AdminUser }>('/auth.php?action=verify');
+    if (data.authenticated && data.user) {
+      // Update cached user from session
+      setStoredMerchant({
+        id: data.user.merchant_id,
+        name: data.user.name || '',
+        email: data.user.email,
+      });
+    }
+    return data;
+  } catch (error) {
+    return { authenticated: false, error: String(error) };
+  }
 }
 
 export async function adminLogout(): Promise<void> {
   try {
     await enterpriseFetch('/auth.php?action=logout', { method: 'POST' });
   } finally {
-    removeAdminToken();
+    clearSession();
   }
 }
 
@@ -498,7 +499,7 @@ export function getStatusColor(status: string): string {
   return colors[status] || colors.pending;
 }
 
-// Helper to extract data from paginated response (handles different field names)
+// Helper to extract data from paginated response
 export function extractPaginatedData<T>(response: PaginatedResponse<T>): T[] {
   return response.data || response.users || response.products || response.compras || [];
 }

@@ -2,11 +2,11 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { useNavigate } from 'react-router-dom';
 import {
   Merchant,
-  getAdminToken,
   getStoredMerchant,
   adminVerify,
   adminLogout,
-  removeAdminToken,
+  clearSession,
+  hasSession,
 } from '@/lib/enterprise-api';
 
 interface AdminAuthContextType {
@@ -25,44 +25,19 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   const refreshAuth = async () => {
-    const token = getAdminToken();
-    const storedMerchant = getStoredMerchant();
-    
-    if (!token) {
-      setMerchant(null);
-      setIsLoading(false);
-      return;
-    }
-
-    // If we have a stored merchant, use it immediately while verifying in background
-    if (storedMerchant) {
-      setMerchant(storedMerchant);
-    }
-
     try {
       const result = await adminVerify();
-      if (result.success) {
-        // Keep using stored merchant data
-        if (!storedMerchant) {
-          setMerchant(null);
-          removeAdminToken();
-        }
+      if (result.authenticated) {
+        // Get the updated merchant from cache
+        const storedMerchant = getStoredMerchant();
+        setMerchant(storedMerchant);
       } else {
-        // If verify returns a non-success payload but we have local session data,
-        // don't immediately destroy the session (can happen with transient issues).
-        if (!storedMerchant) {
-          removeAdminToken();
-          setMerchant(null);
-        }
-      }
-    } catch (error) {
-      // If verification fails but we have stored data, keep the session
-      // This handles temporary network issues
-      console.warn('Token verification failed:', error);
-      if (!storedMerchant) {
-        removeAdminToken();
+        clearSession();
         setMerchant(null);
       }
+    } catch (error) {
+      console.warn('Session verification failed:', error);
+      // Don't clear session on network errors - let user retry
     } finally {
       setIsLoading(false);
     }
@@ -85,9 +60,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     <AdminAuthContext.Provider
       value={{
         merchant,
-        // Consider token as authenticated to prevent redirect loops when verify fails
-        // due to temporary network/CORS issues right after login.
-        isAuthenticated: !!merchant || !!getAdminToken(),
+        isAuthenticated: !!merchant,
         isLoading,
         logout,
         refreshAuth,
@@ -112,9 +85,7 @@ export function RequireAdminAuth({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Only redirect if there's truly no token/session.
-    // This avoids the user getting stuck on login when verify fails but token exists.
-    if (!isLoading && !isAuthenticated && !getAdminToken()) {
+    if (!isLoading && !isAuthenticated) {
       navigate('/enterprise/owner/login');
     }
   }, [isAuthenticated, isLoading, navigate]);

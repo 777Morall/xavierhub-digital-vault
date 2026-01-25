@@ -33,11 +33,12 @@ export default function AdminLogin() {
     try {
       const result = await adminLogin(email, password);
       
-      if (result.success && result.token) {
+      if (result.success && result.user) {
         toast({
           title: 'Sucesso',
-          description: `Bem-vindo, ${result.merchant?.name || 'Admin'}!`,
+          description: `Bem-vindo, ${result.user.name || 'Admin'}!`,
         });
+        // Session cookie is automatically set by the server
         // Use full page reload to ensure auth state is fresh
         window.location.href = '/enterprise/owner/dashboard';
       } else {
