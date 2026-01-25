@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Loader2, AlertCircle, Tv } from "lucide-react";
+import { Loader2, AlertCircle, Crown } from "lucide-react";
 import ProductCard from "./ProductCard";
 import { getProducts, Product } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -27,12 +27,12 @@ const FeaturedProducts = () => {
   };
 
   return (
-    <section id="produtos" className="py-8">
+    <section id="produtos" className="py-4">
       <div className="container mx-auto px-4">
         {/* Section Title with Icon */}
         <div className="flex items-center gap-3 mb-6">
           <div className="flex items-center gap-2">
-            <Tv className="h-5 w-5 text-primary" />
+            <Crown className="h-5 w-5 text-primary" />
             <h2 className="font-display text-xl md:text-2xl font-bold text-foreground">
               PRODUTOS EM DESTAQUE
             </h2>

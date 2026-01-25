@@ -12,6 +12,7 @@ import MyPurchases from "./pages/MyPurchases";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import Suporte from "./pages/Suporte";
 import NotFound from "./pages/NotFound";
 
 // Enterprise Admin Pages
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/registrar" element={<Register />} />
           <Route path="/perfil" element={<Profile />} />
+          <Route path="/suporte" element={<Suporte />} />
           
           {/* Enterprise Admin Routes */}
           <Route path="/enterprise/owner/login" element={<AdminLogin />} />
