@@ -43,7 +43,10 @@ const App = () => (
           
           {/* Enterprise Admin Routes */}
           <Route path="/enterprise/owner/login" element={<AdminLogin />} />
-          <Route path="/enterprise/owner" element={<AdminDashboard />} />
+           {/* canonical admin dashboard */}
+           <Route path="/enterprise/owner/dashboard" element={<AdminDashboard />} />
+           {/* legacy path -> keep working by rendering dashboard */}
+           <Route path="/enterprise/owner" element={<AdminDashboard />} />
           <Route path="/enterprise/owner/users" element={<AdminUsers />} />
           <Route path="/enterprise/owner/users/:id" element={<AdminUsers />} />
           <Route path="/enterprise/owner/products" element={<AdminProducts />} />
