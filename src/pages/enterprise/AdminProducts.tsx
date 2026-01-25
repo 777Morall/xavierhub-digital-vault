@@ -21,6 +21,7 @@ import {
   ProductData,
   formatCurrency,
   getStatusColor,
+  parseNumber,
 } from '@/lib/enterprise-api';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -137,46 +138,60 @@ function ProductsContent() {
     e.stopPropagation();
     try {
       const result = await toggleProductStatus(id);
-      if (result.success && result.data) {
+      if (result.success && result.status) {
         toast({
           title: 'Sucesso',
-          description: `Produto ${result.data.status === 'active' ? 'ativado' : 'inativado'}`,
+          description: `Produto ${result.status === 'active' ? 'ativado' : 'inativado'}`,
         });
         fetchProducts();
         fetchStats();
+      } else if (result.error) {
+        toast({ title: 'Erro', description: result.error, variant: 'destructive' });
       }
     } catch (error) {
       toast({ title: 'Erro', description: 'Falha ao alterar status', variant: 'destructive' });
     }
   };
 
+  const getProductImageUrl = (item: ProductData): string | null => {
+    if (item.file_path) {
+      // If it's a relative path, prepend the base URL
+      if (item.file_path.startsWith('http')) return item.file_path;
+      return `https://api.xavierhub.com/${item.file_path}`;
+    }
+    return null;
+  };
+
   const getProductRevenue = (item: ProductData): number => {
-    return item.stats?.total_revenue ?? item.receita_total ?? 0;
+    return parseNumber(item.receita_total);
   };
 
   const getProductSales = (item: ProductData): number => {
-    return item.stats?.total_sales ?? item.total_vendas ?? 0;
+    return parseNumber(item.total_vendas);
   };
 
   const columns: Column<ProductData>[] = [
     {
       key: 'name',
       header: 'Produto',
-      render: (item) => (
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center overflow-hidden">
-            {item.image_url ? (
-              <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
-            ) : (
-              <Package className="h-6 w-6 text-primary" />
-            )}
+      render: (item) => {
+        const imageUrl = getProductImageUrl(item);
+        return (
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center overflow-hidden">
+              {imageUrl ? (
+                <img src={imageUrl} alt={item.name} className="w-full h-full object-cover" />
+              ) : (
+                <Package className="h-6 w-6 text-primary" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="font-medium text-foreground truncate max-w-[200px]">{item.name}</p>
+              <p className="text-sm text-muted-foreground capitalize">{item.type}</p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="font-medium text-foreground truncate max-w-[200px]">{item.name}</p>
-            <p className="text-sm text-muted-foreground capitalize">{item.type}</p>
-          </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       key: 'price',
