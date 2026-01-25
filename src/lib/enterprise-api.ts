@@ -66,6 +66,83 @@ export interface DashboardResponse {
   ultimas_transacoes: UltimaTransacao[];
 }
 
+// New dashboard types
+export interface VendaPorPeriodo {
+  data: string;
+  quantidade: number;
+  total: string;
+  ticket_medio: string;
+}
+
+export interface VendasPeriodoResponse {
+  success: boolean;
+  periodo: string;
+  vendas: VendaPorPeriodo[];
+}
+
+export interface ProdutoRanking {
+  id: number;
+  name: string;
+  price: string;
+  type: string;
+  total_vendas: number;
+  receita_total: string;
+  ticket_medio: string;
+  vendas_pagas: number;
+  vendas_pendentes: number;
+}
+
+export interface RankingProdutosResponse {
+  success: boolean;
+  ranking: ProdutoRanking[];
+}
+
+export interface TopUsuario {
+  id: number;
+  username: string;
+  email: string;
+  cadastro_em: string;
+  total_compras: number;
+  total_gasto: string;
+  ultima_compra: string;
+}
+
+export interface TopUsuariosResponse {
+  success: boolean;
+  top_usuarios: TopUsuario[];
+}
+
+export interface VendaPorDia {
+  dia: number;
+  vendas: number;
+  receita: string;
+}
+
+export interface MetodoPagamento {
+  payment_method: string;
+  quantidade: number;
+  total: string;
+}
+
+export interface RelatorioFinanceiroResponse {
+  success: boolean;
+  periodo: {
+    mes: string;
+    ano: string;
+  };
+  resumo: {
+    total_transacoes: number;
+    receita_confirmada: string;
+    receita_pendente: string;
+    ticket_medio: string;
+    vendas_pagas: number;
+    vendas_pendentes: number;
+    vendas_canceladas: number;
+  };
+  vendas_por_dia: VendaPorDia[];
+  por_metodo_pagamento: MetodoPagamento[];
+}
+
 export interface UserData {
   id: number;
   username: string;
@@ -238,6 +315,25 @@ export async function adminLogout(): Promise<void> {
 // Dashboard
 export async function getDashboardStats(): Promise<DashboardResponse> {
   return enterpriseFetch('/dashboard.php?action=stats');
+}
+
+export async function getVendasPorPeriodo(periodo: number = 30): Promise<VendasPeriodoResponse> {
+  return enterpriseFetch(`/dashboard.php?action=vendas&periodo=${periodo}`);
+}
+
+export async function getRankingProdutos(limite: number = 10): Promise<RankingProdutosResponse> {
+  return enterpriseFetch(`/dashboard.php?action=ranking_produtos&limite=${limite}`);
+}
+
+export async function getTopUsuarios(limite: number = 10): Promise<TopUsuariosResponse> {
+  return enterpriseFetch(`/dashboard.php?action=top_usuarios&limite=${limite}`);
+}
+
+export async function getRelatorioFinanceiro(mes?: string, ano?: string): Promise<RelatorioFinanceiroResponse> {
+  const params = new URLSearchParams({ action: 'relatorio_financeiro' });
+  if (mes) params.set('mes', mes);
+  if (ano) params.set('ano', ano);
+  return enterpriseFetch(`/dashboard.php?${params.toString()}`);
 }
 
 // Users
