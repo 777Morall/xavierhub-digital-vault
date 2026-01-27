@@ -1,4 +1,4 @@
-const API_URL = 'https://api.xavierhub.com';
+const API_URL = 'https://api.telas7.shop';
 
 export interface Product {
   id: number;
