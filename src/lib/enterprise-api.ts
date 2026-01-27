@@ -1,5 +1,5 @@
 // Enterprise Admin API Client - Session-based Authentication
-const ENTERPRISE_API_URL = 'https://api.xavierhub.com/enterprise';
+const ENTERPRISE_API_URL = 'https://api.telas7.shop/enterprise';
 
 // Types
 export interface AdminUser {
