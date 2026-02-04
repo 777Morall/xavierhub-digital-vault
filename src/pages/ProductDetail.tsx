@@ -129,40 +129,41 @@ const ProductDetail = () => {
             <span>Voltar</span>
           </button>
 
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Product Image */}
-            <div className="relative">
-              <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-secondary border border-border/50 shadow-xl">
-                <img
-                  src={imageUrl}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = getDefaultImage(product.type);
-                  }}
-                />
-                {/* Overlay Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
-              </div>
+          {/* Product Image - Full Width Landscape */}
+          <div className="relative lg:col-span-2 mb-4">
+            <div className="aspect-[16/9] md:aspect-[21/9] rounded-2xl overflow-hidden bg-secondary border border-border/50 shadow-2xl">
+              <img
+                src={imageUrl}
+                alt={product.name}
+                className="w-full h-full object-cover object-center"
+                onError={(e) => {
+                  e.currentTarget.src = getDefaultImage(product.type);
+                }}
+              />
+              {/* Overlay Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
               
-              {/* Glow Effect */}
-              <div className="absolute -inset-6 bg-primary/15 rounded-3xl blur-3xl -z-10" />
-            </div>
-
-            {/* Product Info */}
-            <div className="flex flex-col">
-              {/* Category Badge */}
-              <div className="flex items-center gap-2 mb-4">
-                <Badge variant="secondary" className="gap-1.5">
+              {/* Floating Badge on Image */}
+              <div className="absolute top-4 left-4 flex items-center gap-2">
+                <Badge variant="secondary" className="gap-1.5 bg-background/80 backdrop-blur-sm">
                   <Package className="h-3 w-3" />
                   {getProductTypeLabel(product.type)}
                 </Badge>
-                <Badge className="bg-accent/20 text-accent-foreground border-accent/30 gap-1">
+                <Badge className="bg-primary/80 backdrop-blur-sm text-primary-foreground border-primary/30 gap-1">
                   <Sparkles className="h-3 w-3" />
                   Destaque
                 </Badge>
               </div>
+            </div>
+            
+            {/* Glow Effect */}
+            <div className="absolute -inset-4 bg-primary/10 rounded-3xl blur-3xl -z-10" />
+          </div>
 
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+
+            {/* Product Info - Left Column */}
+            <div className="flex flex-col">
               {/* Title */}
               <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4 leading-tight">
                 {product.name}
@@ -210,25 +211,6 @@ const ProductDetail = () => {
                 </div>
               )}
 
-              {/* Quick Features */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="h-4 w-4 text-primary" />
-                  <span>Download Imediato</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="h-4 w-4 text-primary" />
-                  <span>Acesso Vitalício</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="h-4 w-4 text-primary" />
-                  <span>Suporte via WhatsApp</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="h-4 w-4 text-primary" />
-                  <span>Atualizações Grátis</span>
-                </div>
-              </div>
 
               {/* CTA Button - Premium Style */}
               <Button 
@@ -257,6 +239,56 @@ const ProductDetail = () => {
               <p className="text-xs text-muted-foreground mt-4 text-center">
                 ⚡ Entrega: Via Email e no Minhas Compras
               </p>
+            </div>
+
+            {/* Right Column - Payment & Trust */}
+            <div className="flex flex-col gap-4">
+              {/* Quick Features */}
+              <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-5 border border-border/50">
+                <h3 className="font-display font-semibold text-sm text-muted-foreground uppercase tracking-wider mb-4">O que está incluso</h3>
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Download className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-foreground">Download Imediato</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Clock className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-foreground">Acesso Vitalício</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
+                      <svg className="h-4 w-4 text-green-500" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                      </svg>
+                    </div>
+                    <span className="text-foreground">Suporte via WhatsApp</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Zap className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-foreground">Atualizações Grátis</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Methods */}
+              <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-5 border border-border/50">
+                <h3 className="font-display font-semibold text-sm text-muted-foreground uppercase tracking-wider mb-4">Formas de pagamento</h3>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5 px-3 py-2 bg-primary/10 rounded-lg ring-1 ring-primary/20">
+                    <svg className="h-5 w-5 text-primary" viewBox="0 0 512 512" fill="currentColor">
+                      <path d="M242.4 292.5C247.8 287.1 257.1 287.1 262.5 292.5L339.5 369.5C353.7 383.7 353.7 406.3 339.5 420.5C325.3 434.7 302.7 434.7 288.5 420.5L242.4 374.4C237 369 226.7 369 221.3 374.4L175.2 420.5C## 161 434.7 138.4 434.7 124.2 420.5C110 406.3 110 383.7 124.2 369.5L201.2 292.5C206.6 287.1 216.9 287.1 222.3 292.5L242.4 292.5zM262.5 218.5L339.5 141.5C353.7 127.3 353.7 104.7 339.5 90.5C325.3 76.3 302.7 76.3 288.5 90.5L242.4 136.6C237 142 226.7 142 221.3 136.6L175.2 90.5C161 76.3 138.4 76.3 124.2 90.5C110 104.7 110 127.3 124.2 141.5L201.2 218.5C206.6 223.9 216.9 223.9 222.3 218.5L242.4 218.5C247.8 223.9 257.1 223.9 262.5 218.5z"/>
+                    </svg>
+                    <span className="text-sm font-medium text-primary">PIX</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">Aprovação instantânea</span>
+                </div>
+              </div>
             </div>
           </div>
 
